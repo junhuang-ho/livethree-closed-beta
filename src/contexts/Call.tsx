@@ -352,11 +352,18 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
                     }
 
                 } else {
+                    /**
+                     * TODO:
+                     * warning, this line might be called sometimes on callee side if call ended 
+                     * from caller side either manual or using timeout end
+                     * which in turn hits the 'enqueueSnackbar' error, so comment this out for now
+                     * (wont hit issue if using webhooks)
+                     */
                     console.warn("delete flow - GAS")
                     try {
                         await deleteFlow(callerAddress, calleeAddress)
                     } catch (error: any) {
-                        enqueueSnackbar("Something went wrong!. - Delete flow (in call)", { variant: 'error', autoHideDuration: 3000, action })
+                        // enqueueSnackbar("Something went wrong!. - Delete flow (in call)", { variant: 'error', autoHideDuration: 3000, action })
                         console.error(error)
                     }
                 }
