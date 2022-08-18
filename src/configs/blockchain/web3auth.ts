@@ -5,23 +5,23 @@ export const RPC_URL_POLYGON = import.meta.env.VITE_ALCHEMY_API_URL_POLYGON // p
 export const RPC_URL_MUMBAI = import.meta.env.VITE_ALCHEMY_API_URL_MUMBAI  // process.env.REACT_APP_ALCHEMY_API_URL_MUMBAI
 
 
-// TODO: make this (web3auth details) a config object
-// export const WEB3AUTH_CLIENT_ID = 'BBEeEMBtqxKqfn0n7b0LCwbm8ZrysTPnN0bZjBWLVIqYs3BD4qIL35yUaEKsq_W8BVR2Nx7f_lk9YSItqWtSJVw' as const // web3auth's testnet
-export const WEB3AUTH_CLIENT_ID = 'BMdhaBBKwsMr1jS7Z6rikXs_DDHZaFE1S9zIHrUZRA3J5xi-pTvN_LVm7UpeVbKmwxOk3W0T5YtoPKyrZIuWleQ' as const // web3auth's mainnet (standard - not cyan)
-export const WEB3AUTH_VERIFIER_NAME = 'moonlight-mumbai' as const
-export const BRAND_NAME = 'moonlight' as const
-export const WEB3AUTH_NETWORK_DEFAULT = "mainnet" // "testnet" "mainnet"
-
-// // // Web3Auth's LiveThree credentials
-// const WEB3AUTH_CLIENT_ID_MAINNET = 'BCra18FhoqHZBjima6njP0JKotW1lSDCyjdhcyuHpj8WO_0AbQ04_psVRM-5XV9DpUFYGRbct78l5JVN4qvskh0' as const // web3auth's mainnet (not polygon)
-// const WEB3AUTH_CLIENT_ID_TESTNET = 'BBMnle-LGyXQcvhXXqdS29gEL3zbOZeUgF7p4u9ghFQREXPxEcm1zL_hmYT7RU8TTW0ukM-qghH0DRgNyYDlOIc' as const // web3auth's testnet (not polygon)
-
-// // change following 2 TOGETHER
-// export const WEB3AUTH_CLIENT_ID = WEB3AUTH_CLIENT_ID_MAINNET //WEB3AUTH_CLIENT_ID_TESTNET
+// // TODO: make this (web3auth details) a config object
+// // export const WEB3AUTH_CLIENT_ID = 'BBEeEMBtqxKqfn0n7b0LCwbm8ZrysTPnN0bZjBWLVIqYs3BD4qIL35yUaEKsq_W8BVR2Nx7f_lk9YSItqWtSJVw' as const // web3auth's testnet
+// export const WEB3AUTH_CLIENT_ID = 'BMdhaBBKwsMr1jS7Z6rikXs_DDHZaFE1S9zIHrUZRA3J5xi-pTvN_LVm7UpeVbKmwxOk3W0T5YtoPKyrZIuWleQ' as const // web3auth's mainnet (standard - not cyan)
+// export const WEB3AUTH_VERIFIER_NAME = 'moonlight-mumbai' as const
+// export const BRAND_NAME = 'moonlight' as const
 // export const WEB3AUTH_NETWORK_DEFAULT = "mainnet" // "testnet" "mainnet"
 
-// export const WEB3AUTH_VERIFIER_NAME = 'livethreeweb1' as const
-// export const BRAND_NAME = 'LiveThree' as const
+// // Web3Auth's LiveThree credentials
+const WEB3AUTH_CLIENT_ID_MAINNET = 'BCra18FhoqHZBjima6njP0JKotW1lSDCyjdhcyuHpj8WO_0AbQ04_psVRM-5XV9DpUFYGRbct78l5JVN4qvskh0' as const // web3auth's mainnet (not polygon)
+const WEB3AUTH_CLIENT_ID_TESTNET = 'BBMnle-LGyXQcvhXXqdS29gEL3zbOZeUgF7p4u9ghFQREXPxEcm1zL_hmYT7RU8TTW0ukM-qghH0DRgNyYDlOIc' as const // web3auth's testnet (not polygon)
+
+// change following 2 TOGETHER
+export const WEB3AUTH_CLIENT_ID = WEB3AUTH_CLIENT_ID_MAINNET //WEB3AUTH_CLIENT_ID_TESTNET
+export const WEB3AUTH_NETWORK_DEFAULT = "mainnet" // "testnet" "mainnet"
+
+export const WEB3AUTH_VERIFIER_NAME = 'livethreeweb1' as const
+export const BRAND_NAME = 'LiveThree' as const
 
 
 export const WEB3AUTH_NETWORK = {

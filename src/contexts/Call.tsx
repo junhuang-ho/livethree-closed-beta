@@ -376,6 +376,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
             if (!simpleCleanUp && (activeRoomData?.roomId || rejectCall || active)) {
                 console.warn("firebase room removed")
 
+                // TODO: MAKE THIS A BATCH CALL SAVE COST !!
                 await Promise.all([
                     deleteDoc(doc(COL_REF_CALLER_HAS_ROOM, callerAddress)),
                     deleteDoc(doc(getColRefActive(calleeAddress), callerAddress)),
