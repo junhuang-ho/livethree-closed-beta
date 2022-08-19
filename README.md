@@ -90,6 +90,13 @@ ref:
 we don't have any short term plans for this(and it's quite difficult to do it in generic way, there are a lot of web server frameworks), but I can defintiely point you in the right direction.
 Webhooks are only about setting up an api server, if you want to go with Python the easiest way to do this is using Flask. Here is a simple blog demonstrating this - https://www.realpythonproject.com/intro-to-webhooks-with-and-how-to-receive-them-with-python/
 For just seeing how the webhooks responses will look like you can use this site - https://webhook.site/ to get a webhook url and put in dashboard's developer section, the UI will then show all the incoming webhooks.
+Possible to webhooks for SPAs? to consider revamp version of app.livethree.xyz | OR | if say use Next.js part server style and deploy to hosting, auto have a server to "listen"?
+
+resources for webhook to close money stream:
+1. webhooks 101: https://www.youtube.com/watch?v=41NOoEz3Tzc&ab_channel=freeCodeCamp.org | https://github.com/TwilioDevEd/webhooks-course/blob/main/code/express-discorder/server.js
+2. webhooks in firebase cloud fn: https://firebase.google.com/docs/functions
+3. use reason: https://www.100ms.live/docs/server-side/v2/foundation/webhook#peer-leave-success
+(for 3.) how to distinguish between normal "end call" vs "non-explicit end call" such as window closed / pc shutdown, also, prevent double deleteFlow fn call. - ANS: use peer.leave.success unexpected reason (must test): https://www.100ms.live/docs/server-side/v2/foundation/webhook#peer-leave-success
 
 - logo guide: https://logosbynick.com/logo-files-for-clients/
 
