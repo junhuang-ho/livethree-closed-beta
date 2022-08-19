@@ -13,7 +13,7 @@ export const ButtonCopy = ({ value }: { value: any }) => {
     const theme = useTheme()
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
-    const [{ value: copiedValue, error: copiedError, noUserInteraction: copiedNoUserInteraction }, copyToClipboard] = useCopyToClipboard();
+    const [{ }, copyToClipboard] = useCopyToClipboard();
 
     const action = (snackbarId: any) => (
         <>

@@ -11,6 +11,7 @@ import { Support } from "../../components/Support";
 import { Ringtone } from "../../components/Ringtone";
 import { ChangeHandle } from "../../components/ChangeHandle";
 import { ChangePassword } from "../../components/ChangePassword";
+import { ExposeSecrets } from "../../components/ExposeSecrets";
 import { Logout } from "../../components/Logout";
 
 const SettingsPage = () => {
@@ -38,6 +39,7 @@ const SettingsPage = () => {
                     <Ringtone />
                     <ChangeHandle />
                     <ChangePassword />
+                    <ExposeSecrets />
                     <Logout />
                     {/* <Feedback /> */ }
                     <Box sx={ { p: 5 } }></Box>
