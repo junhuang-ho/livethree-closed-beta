@@ -19,8 +19,8 @@ const FavouritesPage = React.lazy(() => import('./pages/main/FavouritesPage'))
 const CallsPage = React.lazy(() => import('./pages/main/CallsPage'))
 const SettingsPage = React.lazy(() => import('./pages/main/SettingsPage'))
 const CallOneOnOnePage = React.lazy(() => import('./pages/sub/CallOneOnOnePage'))
-const ResetPasswordPage = React.lazy(() => import('./pages/utils/ResetPasswordPage'))
-const ResetPasswordRequestPage = React.lazy(() => import('./pages/utils/ResetPasswordRequestPage'))
+// const ResetPasswordPage = React.lazy(() => import('./pages/utils/ResetPasswordPage'))
+// const ResetPasswordRequestPage = React.lazy(() => import('./pages/utils/ResetPasswordRequestPage'))
 const VerifyFirebaseEmailRequest = React.lazy(() => import('./pages/utils/VerifyFirebaseEmailRequest'))
 
 export const App = () => {
@@ -45,7 +45,7 @@ export const App = () => {
             <Route path='/sign-up' element={ <React.Suspense fallback={ <SplashPage /> }><SignUpPage /></React.Suspense> } />
             <Route path='/verification-request' element={ <React.Suspense fallback={ <SplashPage /> }><VerifyFirebaseEmailRequest /></React.Suspense> } />
             {/* <Route path='/reset-password' element={ <React.Suspense fallback={ <SplashPage /> }><ResetPasswordPage /></React.Suspense> } /> */ }
-            <Route path='/reset-password-request' element={ <React.Suspense fallback={ <SplashPage /> }><ResetPasswordRequestPage /></React.Suspense> } />
+            {/* <Route path='/reset-password-request' element={ <React.Suspense fallback={ <SplashPage /> }><ResetPasswordRequestPage /></React.Suspense> } /> */ }
             <Route path='/error' element={ <ErrorPage /> } />
             <Route
                 path="*"
