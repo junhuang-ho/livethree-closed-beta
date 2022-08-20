@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore" // 
+import { setDoc, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore" // 
 import { auth, analytics } from '../../services/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { logEvent } from 'firebase/analytics';
@@ -19,6 +19,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import Slider from '@mui/material/Slider';
 
 import UploadIcon from '@mui/icons-material/Upload';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -80,8 +81,8 @@ const Input = styled('input')({
     display: 'none',
 });
 
-const firestoreCharacterMinDisplayName = 3
-const firestoreCharacterMaxDisplayName = 50
+// const firestoreCharacterMinDisplayName = 3
+// const firestoreCharacterMaxDisplayName = 50
 const firestoreCharacterMaxHeadline = 200
 
 export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser, inFavPage }: any) => {
@@ -106,11 +107,11 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
     const [cropped, setCropped] = useState<boolean>(false)
     const [croppedImage, setCroppedImage] = useState<any>(null)
     const [displayImageCropper, setDisplayImageCropper] = useState<boolean>(false)
+    const [zoom, setZoom] = useState(1)
 
     const [saving, setSaving] = useState<boolean>(false)
     const [editHeader, setEditHeader] = useState<boolean>(false)
     const [newImage, setNewImage] = useState("")
-    const [newDisplayName, setNewDisplayName] = useState<string>("")
     const [newHeadline, setNewHeadline] = useState<string>("")
     const [confirmEndCall, setConfirmEndCall] = useState<boolean>(false)
     const [previewMode] = usePreviewMode(localAddress, dataUser?.address)
@@ -239,7 +240,6 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                                                             } catch (error) {
                                                                 console.error(error)
                                                             }
-
                                                         }
                                                     } }
                                                 />
@@ -289,75 +289,41 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                                 </Stack>
                             ) }
                             <Stack justifyContent="space-evenly">
-                                { editHeader ? (
-                                    <Stack>
-                                        <TextField
-                                            disabled={ saving }
-                                            variant="standard"
-                                            fullWidth
-                                            multiline
-                                            placeholder="Display name"
-                                            value={ newDisplayName }
-                                            inputProps={ { minLength: firestoreCharacterMinDisplayName, maxLength: firestoreCharacterMaxDisplayName /** based on firestore rules */ } }
-                                            onChange={ (event) => {
-                                                const value = event.target.value
-                                                setNewDisplayName(value)
-                                            } }
-                                            error={ newDisplayName.length < 3 }
-                                            helperText={ newDisplayName.length < 3 && "Minimum 3" }
-                                            sx={ { pb: 1 } }
-                                        />
-                                        <Stack direction="row-reverse">
-                                            <Typography variant="body2">
-                                                { `${ newDisplayName?.length }/${ firestoreCharacterMaxDisplayName }` }
-                                            </Typography>
-                                        </Stack>
-                                    </Stack>
-                                ) : (
+                                { !editHeader &&
                                     <Box>
-                                        { !dataUser.displayName ? (
-                                            <Typography align="justify" color={ palette.grey[400] }>{ localAddress }</Typography>
+                                        { dataUser.flowRate ? (
+                                            <DisplayFromPerSecondToXXX flowRate={ dataUser.flowRate } />
                                         ) : (
-                                            <Stack direction={ isMobile ? "column" : "row" } alignItems="center" spacing={ 2 }>
-                                                <Typography variant="h5">{ dataUser.displayName }</Typography>
+                                            <Box>
+                                                { !closeWarning3 &&
+                                                    <Stack direction="row" alignItems="center" justifyContent="center" spacing={ 1 } color="error.main" sx={ { border: 1, borderRadius: 2, pl: 1, pr: 1 } }>
+                                                        <ErrorIcon fontSize="small" />
+                                                        <Typography align="justify" variant="caption">
+                                                            { previewMode && !showcaseMode ? "Please set your rate in the settings tab to start receiving calls" : "Not available for call as this user has not set rate" }
+                                                        </Typography>
+                                                        <CloseIcon fontSize="small" onClick={ () => { setCloseWarning3(true) } } />
+                                                    </Stack>
+                                                }
+                                            </Box>
 
-                                                { dataUser.flowRate ? (
-                                                    <DisplayFromPerSecondToXXX flowRate={ dataUser.flowRate } />
-                                                ) : (
-                                                    <Box>
-                                                        { !closeWarning3 &&
-                                                            <Stack direction="row" alignItems="center" justifyContent="center" spacing={ 1 } color="error.main" sx={ { border: 1, borderRadius: 2, pl: 1, pr: 1 } }>
-                                                                <ErrorIcon fontSize="small" />
-                                                                <Typography align="justify" variant="caption">
-                                                                    { previewMode && !showcaseMode ? "Please set your rate in the settings tab to start receiving calls" : "Not available for call as this user has not set rate" }
-                                                                </Typography>
-                                                                <CloseIcon fontSize="small" onClick={ () => { setCloseWarning3(true) } } />
-                                                            </Stack>
-                                                        }
-                                                    </Box>
-
-                                                ) }
-                                            </Stack>
                                         ) }
                                     </Box>
-                                ) }
-                                { editHeader ? (
-                                    null
-                                ) : (
+                                }
+
+                                { !editHeader &&
                                     <Stack direction="row" alignItems="center">
                                         <FiberManualRecordIcon fontSize="inherit" sx={ { color: dataUser?.online ? "#30ef63" : "#808080" } } />
                                         <Typography>{ dataUser?.online ? "online" : "offline" }</Typography>
                                         <Typography>{ dataUser?.isActive ? " [in call]" : "" }</Typography>
                                     </Stack>
-                                ) }
+                                }
                                 { editHeader ? (
-                                    <Box sx={ { p: 1 } }></Box>
+                                    <Box sx={ { p: 6 } }></Box>
                                 ) : (
                                     <Stack
                                         direction="row"
                                         justifyContent="flex-start"
                                         alignItems="center"
-
                                     >
                                         <Typography variant="body1">Address { isMobile ? shortenAddress(dataUser.address) : dataUser.address }</Typography>
                                         <ButtonCopy value={ dataUser.address } />
@@ -592,12 +558,11 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                                             <StandardButton
                                                 variant="contained"
                                                 color="primary"
-                                                disabled={ newDisplayName.length < 2 }
+                                                disabled={ newHeadline.length > 200 || (dataUser?.headline === newHeadline && dataUser?.photoURL === newImage) }
                                                 onClick={ async () => {
                                                     setSaving(true)
                                                     try {
                                                         let newHeaders = {
-                                                            displayName: newDisplayName,
                                                             headline: newHeadline,
                                                         }
                                                         if (cropped) {
@@ -612,12 +577,6 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                                                         setCropped(false)
 
                                                         await updateDoc(doc(COL_REF_USERS, uid), newHeaders)
-
-                                                        // await updateDoc(doc(COL_REF_USER, uid), {
-                                                        //     displayName: newDisplayName,
-                                                        //     headline: newHeadline,
-                                                        //     photoURL: profilePictureURL,
-                                                        // })
 
                                                         setEditHeader(false)
                                                     } catch (error) {
@@ -646,13 +605,9 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                             ) : (
                                 <IconButton
                                     onClick={ () => {
-                                        if (!dataUser.displayName) {
-                                            setNewDisplayName("")
-                                        }
                                         if (!dataUser.headline) {
                                             setNewHeadline("")
                                         }
-                                        setNewDisplayName(dataUser.displayName)
                                         setNewHeadline(dataUser.headline)
                                         setEditHeader(true)
                                     } }
@@ -742,10 +697,27 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                     { "Adjust photo" }
                 </DialogTitle>
                 <DialogContent>
-                    <ImageCropper srcImage={ newImage } setCroppedAreaPixels={ setCroppedAreaPixels } />
+                    <ImageCropper
+                        srcImage={ newImage } setCroppedAreaPixels={ setCroppedAreaPixels }
+                        zoom={ zoom } setZoom={ setZoom }
+                    />
+                    <Stack alignItems='center'>
+                        <Slider
+                            min={ 1 }
+                            max={ 3 }
+                            step={ 0.1 }
+                            value={ zoom }
+                            onChange={ (e: any) => {
+                                setZoom(e.target.value)
+                            } }
+                            valueLabelDisplay="auto"
+                            sx={ { width: '50%' } }
+                        />
+                    </Stack>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={ { p: 3 } }>
                     <Button
+                        variant="contained"
                         onClick={ () => {
                             setCropped(false)
                             setCroppedImage(null)
@@ -755,6 +727,7 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                         CANCEL
                     </Button>
                     <Button
+                        variant="contained"
                         disabled={ isInitiating }
                         onClick={ async () => {
                             const croppedImage: any = await getCroppedImg(
@@ -769,7 +742,6 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                     >
                         CROP
                     </Button>
-
                 </DialogActions>
             </Dialog>
         </Card>

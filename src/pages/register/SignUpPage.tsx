@@ -13,7 +13,6 @@ import { auth } from "../../services/firebase";
 
 import { useResponsive } from '../../hooks/useResponsive';
 
-import { ErrorPage } from '../utils/ErrorPage';
 import { Logo } from '../../components/Logo';
 import { SignUpForm } from '../../components/SignUpForm';
 
@@ -61,8 +60,8 @@ const SignUpPage = () => {
     const isMobile = useResponsive('down', 'sm');
 
     const [createUserWithEmailAndPassword, _, __, firebaseUserError] = useCreateUserWithEmailAndPassword(auth);
-    const { user: web3authUser, loggingIn, connecting } = useWeb3Auth()
-    const { firebaseUser, isSigningUp, setIsSigningUp } = useAuthenticationState()
+    const { user: web3authUser } = useWeb3Auth()
+    const { firebaseUser } = useAuthenticationState()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -76,95 +75,68 @@ const SignUpPage = () => {
     );
     useEffect(() => {
         if (firebaseUserError && isSubmitting) {
-            setIsSigningUp(false)
             enqueueSnackbar("Sign up error, email may have already been registered.", { variant: 'error', autoHideDuration: 2000, action })
         }
     }, [firebaseUserError, isSubmitting])
 
     useEffect(() => {
-        if (firebaseUser && web3authUser && isSigningUp) {
+        if (firebaseUser && web3authUser) {
             setIsSubmitting(false)
         }
-    }, [firebaseUser, web3authUser, isSigningUp])
+    }, [firebaseUser, web3authUser])
 
-    return (
-        <RootStyle>
-            <HeaderStyle>
-                { !isSigningUp && !isMobile && !isSubmitting && (
-                    <Typography variant="body2" sx={ { mt: { md: -2 } } }>
-                        Already have an account? { '' }
-                        <Link variant="subtitle2" component={ RouterLink } to="/sign-in">
-                            Sign In
-                        </Link>
-                    </Typography>
-                ) }
-            </HeaderStyle>
+    if (!firebaseUser) {
+        return (
+            <RootStyle>
+                <HeaderStyle>
+                    { !isMobile && !isSubmitting && (
+                        <Typography variant="body2" sx={ { mt: { md: -2 } } }>
+                            Already have an account? { '' }
+                            <Link variant="subtitle2" component={ RouterLink } to="/sign-in">
+                                Sign In
+                            </Link>
+                        </Typography>
+                    ) }
+                </HeaderStyle>
 
-            <Container>
-                <ContentStyle>
-                    <Stack
-                        justifyContent="center"
-                        spacing={ 10 }
-                    >
-                        <Logo bgGrey={ true } />
-                        <Box>
-                            <Typography variant="h4" gutterBottom sx={ { mb: 5 } }>
-                                Get started.
-                            </Typography>
-                            {/* secondary text style */ }
-                            {/* <Typography sx={ { color: 'text.secondary', mb: 5 } }>Free forever. No credit card needed.</Typography> */ }
-
-                            {/* <AuthSocial /> */ }
-
-                            <SignUpForm
-                                createUserWithEmailAndPassword={ createUserWithEmailAndPassword }
-                                isSigningUp={ isSigningUp }
-                                setIsSigningUp={ setIsSigningUp }
-                                setIsSubmitting={ setIsSubmitting }
-                            />
-                            {/* TODO: split signupform to separate components and render based on section, make required fields and add "skip" - refer SignUpDetailsPage.js in moonlight-2 */ }
-
-                            { !isSigningUp && !isSubmitting ? (
-                                // <Typography variant="body2" align="center" sx={ { color: 'text.secondary', mt: 3 } }>
-                                //     By registering, I agree to LiveThree's
-                                //     {/* <Link underline="always" color="text.primary" href="#">
-                                //         Terms of Service
-                                //     </Link>
-                                //      { ' ' }and{ ' ' }
-                                //     <Link underline="always" color="text.primary" href="#">
-                                //         Privacy Policy
-                                //     </Link> */}
-                                //     <Button
-                                //         sx={ { pt: 0.4 } }
-                                //         onClick={ () => {
-                                //             setDisplayTermsOfService(true)
-                                //         } }
-                                //     >
-                                //         <Typography variant="body2" color="black" sx={ { textDecoration: 'underline' } }>
-                                //             Terms of Service
-                                //         </Typography>
-                                //     </Button>
-                                //     .
-                                // </Typography>
-                                null
-                            ) : (
-                                <></>
-                            ) }
-                            { !isSigningUp && isMobile && !isSubmitting && (
-                                <Typography variant="body2" sx={ { mt: 3, textAlign: 'center' } }>
-                                    Already have an account?{ ' ' }
-                                    <Link variant="subtitle2" to="/sign-in" component={ RouterLink }>
-                                        Sign In
-                                    </Link>
+                <Container>
+                    <ContentStyle>
+                        <Stack
+                            justifyContent="center"
+                            spacing={ 10 }
+                        >
+                            <Logo bgGrey={ true } />
+                            <Box>
+                                <Typography variant="h4" gutterBottom sx={ { mb: 5 } }>
+                                    Get started.
                                 </Typography>
-                            ) }
-                        </Box>
-                    </Stack>
-                    {/* <DialogTermsOfService open={ displayTermsOfService } setOpen={ setDisplayTermsOfService } /> */ }
-                </ContentStyle>
-            </Container>
-        </RootStyle>
-    )
+                                {/* secondary text style */ }
+                                {/* <Typography sx={ { color: 'text.secondary', mb: 5 } }>Free forever. No credit card needed.</Typography> */ }
+
+                                {/* <AuthSocial /> */ }
+
+                                <SignUpForm
+                                    createUserWithEmailAndPassword={ createUserWithEmailAndPassword }
+                                    setIsSubmitting={ setIsSubmitting }
+                                />
+                                { isMobile && !isSubmitting && (
+                                    <Typography variant="body2" sx={ { mt: 3, textAlign: 'center' } }>
+                                        Already have an account?{ ' ' }
+                                        <Link variant="subtitle2" to="/sign-in" component={ RouterLink }>
+                                            Sign In
+                                        </Link>
+                                    </Typography>
+                                ) }
+                            </Box>
+                        </Stack>
+                        {/* <DialogTermsOfService open={ displayTermsOfService } setOpen={ setDisplayTermsOfService } /> */ }
+                    </ContentStyle>
+                </Container>
+            </RootStyle>
+        )
+    }
+
+    return <SplashPage />
 }
 
 export default SignUpPage

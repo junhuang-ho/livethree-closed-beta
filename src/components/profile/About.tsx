@@ -28,7 +28,7 @@ export const About = ({ uid, dataUser, showcaseMode }: any) => {
             <CardContent sx={ { pl: 5, pr: 5 } }>
                 <Stack>
                     <Stack direction="row" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h4">About { dataUser.displayName }</Typography>
+                        <Typography variant="h4">About</Typography>
                         { showcaseMode ? (
                             <Box></Box>
                         ) : (

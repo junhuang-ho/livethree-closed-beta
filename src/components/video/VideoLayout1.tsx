@@ -8,6 +8,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import { shortenAddress } from '../../utils';
+
 export const VideoLayout1 = ({ peerLocal, peerRemote, maxWidth }: any) => {
     const videoFrameRef = useRef<any>()
 
@@ -44,7 +46,6 @@ export const VideoLayout1 = ({ peerLocal, peerRemote, maxWidth }: any) => {
                                 muted
                                 playsInline
                             />
-                            {/* <Typography sx={ { position: "absolute", top: 0, right: 0, pr: 1 } }>{ peerRemote.name }</Typography> */ }
                         </Stack>
                     </Box>
                 </animated.div>
@@ -72,10 +73,9 @@ export const VideoLayout1 = ({ peerLocal, peerRemote, maxWidth }: any) => {
                         alignItems="center"
                         sx={ { width: "100%", pb: "56.25%", backgroundColor: "#22272E" } }
                     >
-                        <Typography color="white" align="right" sx={ { width: "100%", p: 1 } }>{ peerLocal.name }</Typography>
+                        <Typography color="white" align="right" sx={ { width: "100%", p: 1 } }>{ peerLocal.name.length > 15 ? shortenAddress(peerLocal.name) : `@${ peerLocal.name }` }</Typography>
                     </Box>
                 ) }
-                {/* <Typography sx={ { position: "absolute", top: 0, right: 0, pt: 1, pr: 2 } }>{ peerLocal.name }</Typography> */ }
             </Stack>
         </Box >
     )

@@ -3,13 +3,12 @@ import { useState, useCallback } from "react"
 import Cropper from 'react-easy-crop'
 
 import Box from "@material-ui/core/Box"
-import Slider from '@mui/material/Slider';
+import Stack from '@mui/material/Stack';
 
 // ref: https://www.npmjs.com/package/react-easy-crop
 
-export const ImageCropper = ({ srcImage, setCroppedAreaPixels }: any) => {
+export const ImageCropper = ({ srcImage, setCroppedAreaPixels, zoom, setZoom }: any) => {
     const [crop, setCrop] = useState({ x: 0, y: 0 })
-    const [zoom, setZoom] = useState(1)
 
     const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
         setCroppedAreaPixels(croppedAreaPixels)
@@ -17,9 +16,7 @@ export const ImageCropper = ({ srcImage, setCroppedAreaPixels }: any) => {
 
 
     return (
-        <Box
-            sx={ { position: "relative", width: "100%", height: "50vh" } }
-        >
+        <Box>
             { srcImage === "" ? (
                 <Box bgcolor="primary.main" display="flex"
                     alignItems="center"
@@ -27,7 +24,7 @@ export const ImageCropper = ({ srcImage, setCroppedAreaPixels }: any) => {
                     profile picture
                 </Box>
             ) : (
-                <Box>
+                <Stack alignItems='center' sx={ { height: '80vh', position: "relative" } }>
                     <Cropper
                         image={ srcImage }
                         crop={ crop }
@@ -38,19 +35,11 @@ export const ImageCropper = ({ srcImage, setCroppedAreaPixels }: any) => {
                         onCropChange={ setCrop }
                         onCropComplete={ onCropComplete }
                         onZoomChange={ setZoom }
+                        objectFit="auto-cover"
                     />
-                    <Slider
-                        min={ 1 }
-                        max={ 3 }
-                        step={ 0.1 }
-                        value={ zoom }
-                        onChange={ (e: any) => {
-                            setZoom(e.target.value)
-                        } }
-                        valueLabelDisplay="auto"
-                    />
-                </Box>
-            ) }
+                </Stack>
+            )
+            }
         </Box>
 
     )

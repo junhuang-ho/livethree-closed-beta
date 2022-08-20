@@ -39,7 +39,7 @@ export const App = () => {
                 <Route path='/calls' element={ <React.Suspense fallback={ <SplashPage /> }><CallsPage /></React.Suspense> } />
                 <Route path='/settings' element={ <React.Suspense fallback={ <SplashPage /> }><SettingsPage /></React.Suspense> } />
                 <Route path='/call/:caller/:callee/:flowRate' element={ <React.Suspense fallback={ <SplashPage /> }><CallOneOnOnePage /></React.Suspense> } />
-                <Route index element={ <React.Suspense fallback={ <SplashPage /> }><FavouritesPage /></React.Suspense> } />
+                <Route index element={ <React.Suspense fallback={ <SplashPage /> }><ProfileMePage /></React.Suspense> } />
             </Route >
             <Route path='/sign-in' element={ <React.Suspense fallback={ <SplashPage /> }><SignInPage /></React.Suspense> } />
             <Route path='/sign-up' element={ <React.Suspense fallback={ <SplashPage /> }><SignUpPage /></React.Suspense> } />

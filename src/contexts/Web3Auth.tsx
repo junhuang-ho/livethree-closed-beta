@@ -264,6 +264,7 @@ export const Web3AuthProvider = ({ children }: IWeb3AuthProps) => {
                 console.warn(NO_WEB3AUTH_MESSAGE);
                 return;
             }
+            console.log("LiveThree: web3auth login attempt")
             const localProvider = await web3AuthInstance.connectTo(adapter, {
                 relogin: true,
                 loginProvider: loginProvider,
@@ -293,6 +294,7 @@ export const Web3AuthProvider = ({ children }: IWeb3AuthProps) => {
         }
         try {
             setLoggingOut(true);
+            console.log("LiveThree: web3auth logout attempt")
             await web3AuthInstance.logout();
             setWallet(null);
         } catch (error) {

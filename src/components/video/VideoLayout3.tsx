@@ -6,6 +6,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import { shortenAddress } from '../../utils';
+
 export const VideoLayout3 = ({ peerLocal, peerRemote, maxWidth }: any) => {
 
     const isMobile = useResponsive('down', 'sm');
@@ -42,7 +44,7 @@ export const VideoLayout3 = ({ peerLocal, peerRemote, maxWidth }: any) => {
                         alignItems="center"
                         sx={ { width: trackLocal?.width, height: trackLocal?.height, backgroundColor: "#22272E" } }
                     >
-                        <Typography color="white">{ peerLocal.name }</Typography>
+                        <Typography color="white">{ peerLocal.name.length > 15 ? shortenAddress(peerLocal.name) : `@${ peerLocal.name }` }</Typography>
                     </Box>
                 ) }
                 { videoTrackRemote?.enabled ? (
@@ -60,7 +62,7 @@ export const VideoLayout3 = ({ peerLocal, peerRemote, maxWidth }: any) => {
                         alignItems="center"
                         sx={ { width: trackLocal?.width, height: trackLocal?.height, backgroundColor: "#22272E" } }
                     >
-                        <Typography color="white">{ peerRemote.name }</Typography>
+                        <Typography color="white">{ peerRemote.name.length > 15 ? shortenAddress(peerRemote.name) : `@${ peerRemote.name }` }</Typography>
                     </Box>
                 ) }
             </Stack >

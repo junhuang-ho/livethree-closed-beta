@@ -190,9 +190,19 @@ export const setOnline = async (uid: any, isOnline: boolean) => {
         return
     }
     console.warn("setting online status", isOnline)
-    await updateDoc(doc(COL_REF_USERS, uid), {
-        online: isOnline
-    })
+
+    try {
+        await updateDoc(doc(COL_REF_USERS, uid), {
+            online: isOnline
+        })
+    } catch (error: any) {
+        const ERROR_MSG = "Missing or insufficient permissions."
+        if (error.message === ERROR_MSG) {
+            console.warn('LiveThree setting online status:', error.message, '- error only hit on register')
+        } else {
+            console.error('LiveThree setting online status:', error, '- unexpected')
+        }
+    }
 }
 
 export const timeout = (ms: number) => {

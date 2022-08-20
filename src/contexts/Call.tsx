@@ -468,8 +468,8 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
                 roomId: roomId,
                 caller: localAddress,
                 callerToken: token?.data,
+                callerDisplayName: localUserData?.handle || localAddress || "error_loading_name",
                 callerPicture: localUserData?.photoURL,
-                callerDisplayName: localUserData?.displayName,
                 callerUid: firebaseUser?.uid,
                 callerChainId: chainId,
                 callStartTimestamp: Date.now(),
@@ -506,14 +506,14 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
             await updateDoc(doc(getColRefActive(localAddress), callerAddress), {// TODO: save these data locally?
                 callee: localAddress,
                 calleeToken: tokenData,
+                calleeDisplayName: localUserData?.handle || localAddress || "error_loading_name",
                 calleePicture: localUserData?.photoURL,
-                calleeDisplayName: localUserData?.displayName,
                 calleeUid: firebaseUser?.uid,
                 flowRate: localUserData?.flowRate,
             })
 
             hmsActions.join({
-                userName: localUserData?.displayName,
+                userName: localUserData?.handle || localAddress || "error_loading_name",
                 authToken: tokenData
             });
 
@@ -537,7 +537,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         if (activeRoomData?.caller === localAddress && activeRoomData?.callee === otherAddress && activeRoomData?.calleeToken) {
             setIsEntering(true)
             hmsActions.join({
-                userName: localUserData?.displayName,
+                userName: localUserData?.handle || localAddress || "error_loading_name",
                 authToken: activeRoomData?.callerToken
             });
             setIsCallerInCall(true)

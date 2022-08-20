@@ -338,7 +338,12 @@ const CallOneOnOnePage = () => {
                                                         alignItems="center"
 
                                                     >
-                                                        <Box>{ `${ activeRoomData?.callerDisplayName } | ${ isMobile ? shortenAddress(params.caller!) : params.caller }` }</Box>
+                                                        { params.caller === activeRoomData?.callerDisplayName ? (
+                                                            <Box>{ `${ isMobile ? shortenAddress(params.caller!) : params.caller }` }</Box>
+                                                        ) : (
+                                                            <Box>{ `${ activeRoomData?.callerDisplayName } | ${ isMobile ? shortenAddress(params.caller!) : params.caller }` }</Box>
+                                                        ) }
+
                                                         <ButtonCopy value={ params.caller } />
                                                     </Stack>
                                                     <Stack
@@ -355,7 +360,12 @@ const CallOneOnOnePage = () => {
                                                         alignItems="center"
 
                                                     >
-                                                        <Box>{ `${ activeRoomData?.calleeDisplayName } | ${ isMobile ? shortenAddress(params.callee!) : params.callee }` }</Box>
+                                                        { params.callee === activeRoomData?.calleeDisplayName ? (
+                                                            <Box>{ `${ isMobile ? shortenAddress(params.callee!) : params.callee }` }</Box>
+                                                        ) : (
+                                                            <Box>{ `${ activeRoomData?.calleeDisplayName } | ${ isMobile ? shortenAddress(params.callee!) : params.callee }` }</Box>
+                                                        ) }
+
                                                         <ButtonCopy value={ params.callee } />
                                                     </Stack>
                                                 </Stack>

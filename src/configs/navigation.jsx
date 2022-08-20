@@ -14,7 +14,7 @@ export const getNavConfig = async (uid) =>
         {
             title: 'me',
             path: '/my-profile',
-            icon: data.photoURL, //<Avatar src={ data.photoURL } alt="profile" />
+            icon: data?.photoURL || "", //<Avatar src={ data.photoURL } alt="profile" />
         },
         {
             title: 'favourites',

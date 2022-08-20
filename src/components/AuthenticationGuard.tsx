@@ -6,14 +6,13 @@ import { useAuthenticationState } from '../contexts/AuthenticationState';
 
 import { SplashPage } from '../pages/utils/SplashPage';
 
-
 import { setOnline } from "../utils"
 
 // TODO: this will become a simple auth guard, so if not firebaseUser + web3authUser + isSigningUp, then reject
 
 export const AuthenticationGuard = ({ children }: { children: JSX.Element }) => {
     const { user: web3authUser, loggingIn, loggingOut, connecting } = useWeb3Auth()
-    const { firebaseUser, isLoadingFirebaseUser, isSigningUp } = useAuthenticationState()
+    const { firebaseUser, isLoadingFirebaseUser } = useAuthenticationState()
 
     useEffect(() => {
         const setOffline = async () => {
@@ -26,20 +25,21 @@ export const AuthenticationGuard = ({ children }: { children: JSX.Element }) => 
     }, [firebaseUser])
 
     useEffect(() => {
-        if (firebaseUser) {
-            if (web3authUser && !isSigningUp) {
+        if (firebaseUser?.emailVerified) {
+            if (web3authUser) {
                 setOnline(firebaseUser?.uid, true)
             } else {
                 setOnline(firebaseUser?.uid, false)
             }
         }
-    }, [firebaseUser, web3authUser, isSigningUp])
+
+    }, [firebaseUser, web3authUser])
 
     if (isLoadingFirebaseUser || loggingIn || loggingOut || connecting || (firebaseUser && !web3authUser)) {
         return <SplashPage />
     }
 
-    if (firebaseUser && web3authUser && !isSigningUp) {
+    if (firebaseUser && web3authUser) {
         if (firebaseUser?.emailVerified) {
             return children
         } else {

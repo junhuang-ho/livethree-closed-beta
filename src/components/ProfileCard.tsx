@@ -65,11 +65,10 @@ export const ProfileCard = ({ address, isMobile }: { address: string, isMobile: 
                 >
                     <ListItemIcon>
                         <Avatar
-                            src={ data.photoURL }
-                            alt={ data.displayName }
+                            src={ data?.photoURL }
                         />
                     </ListItemIcon>
-                    <ListItemText primary={ data.displayName } />
+                    <ListItemText primary={ data?.handle || data?.address } />
                 </ListItemButton>
             ) : (
                 <div>loading</div>
@@ -94,12 +93,11 @@ export const ProfileCard = ({ address, isMobile }: { address: string, isMobile: 
                             component="img"
                             height="160"
                             image={ data.photoURL ? data.photoURL : placeholder_image }
-                            alt={ data.displayName }
                         />
                         <CardContent sx={ { height: 130 } }>
                             <Stack>
                                 <Typography variant="subtitle2" sx={ { pb: 2 } }>
-                                    { data.displayName }
+                                    { data?.handle || data?.address }
                                 </Typography>
                                 {/* Typography's sx prop ref: https://stackoverflow.com/a/32585024  |  https://stackoverflow.com/a/71324014 */ }
                                 <Typography variant="body2" sx={ {

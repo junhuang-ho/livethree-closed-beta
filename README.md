@@ -38,10 +38,7 @@ ref: https://stackoverflow.com/questions/42458434/how-to-set-build-env-variables
 
 ### Before close beta
 
-- searchable by displayName OR @username (enforce uniqueness on firestore lvl and client lvl)
-- expose private key / seed phrase
-- on-ramp
-- connect wallet | research ENS, besides making able to search by address, make searchable by ENS and normal LiveThree displayname
+- connect wallet
 
 
 
