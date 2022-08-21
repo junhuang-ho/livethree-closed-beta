@@ -6,7 +6,6 @@ import { NavigationLayout } from './NavigationLayout';
 import { Guide } from '../components/Guide';
 // import { Debugger } from '../components/Debugger';
 import { Debugger2 } from '../components/Debugger2';
-// import { DebuggerTest } from '../components/DebuggerTest';
 import { WalletDisplay } from '../components/WalletDisplay';
 
 import { useCall } from '../contexts/Call';
@@ -62,7 +61,6 @@ export const MainLayout = () => {
             <Guide />
             {/* { isDebugger && <Debugger /> } */ }
             <Debugger2 />
-            {/* <DebuggerTest /> */ }
         </RootStyle>
     )
 }
