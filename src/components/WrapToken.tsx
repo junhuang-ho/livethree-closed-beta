@@ -34,7 +34,7 @@ export const WrapToken = () => {
     const {
         tokenAllowance, tokenSymbol, tokenXSymbol, tokenBalance,
         tokenXBalance, approveToken, upgradeToken, downgradeTokenX,
-        // isTransactionPending 
+        isTransactionPending
     } = useSuperfluidGas()
     const { chainId } = useWeb3Auth()
 
@@ -192,7 +192,7 @@ export const WrapToken = () => {
                             <StandardButton
                                 variant="contained"
                                 disabled={
-                                    isProcessing ||
+                                    isProcessing || isTransactionPending ||
                                     (!toggled ?
                                         (tokenAllowance === "0" ? (
                                             !wrapAmount

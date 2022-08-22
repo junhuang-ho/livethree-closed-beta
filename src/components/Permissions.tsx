@@ -15,7 +15,7 @@ import { useSuperfluidGas } from '../contexts/SuperfluidGas';
 import { useSnackbar } from 'notistack';
 
 export const Permissions = () => {
-    const { grantOperatorDeletePermission, revokeOperatorAllPermissions, hasDeletePermission } = useSuperfluidGas()
+    const { grantOperatorDeletePermission, revokeOperatorAllPermissions, hasDeletePermission, isTransactionPending } = useSuperfluidGas()
 
     const [isProcessing, setIsProcessing] = useState<boolean>(false)
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -68,7 +68,7 @@ export const Permissions = () => {
                     <StyledGasBadge badgeContent={ <IconGas /> }>
                         <StandardButton
                             variant="contained"
-                            disabled={ isProcessing }
+                            disabled={ isProcessing || isTransactionPending }
                             onClick={ async () => {
                                 setIsProcessing(true)
                                 try {

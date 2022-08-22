@@ -9,13 +9,15 @@ import { logEvent } from 'firebase/analytics';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import {
     useAVToggle,
-    // useHMSActions,
+    useHMSActions,
     useHMSStore,
     // useHMSNotifications,
     selectIsConnectedToRoom,
     selectLocalPeer,
     selectRemotePeers,
     selectPermissions,
+    selectDevices,
+    // selectLocalMediaSettings,
     // selectIsLocalAudioEnabled,
     // selectIsLocalVideoEnabled,
     // selectPeerCount,
@@ -26,6 +28,10 @@ import {
 } from "@100mslive/react-sdk";
 
 import Box from "@mui/material/Box";
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Stack from "@mui/material/Stack";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -33,6 +39,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Tooltip from "@mui/material/Tooltip";
 import Card from "@mui/material/Card";
+import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
@@ -71,13 +78,17 @@ const CallOneOnOnePage = () => {
         toggleVideo
     } = useAVToggle((err) => { throw err });
 
-    // const hmsActions = useHMSActions();
+    const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const localPeer = useHMSStore(selectLocalPeer);
     const remotePeers = useHMSStore(selectRemotePeers);
     const permissions = useHMSStore(selectPermissions);
-    // const audioEnabled = useHMSStore(selectIsLocalAudioEnabled);
-    // const videoEnabled = useHMSStore(selectIsLocalVideoEnabled);
+    const devices = useHMSStore(selectDevices)
+    // const selectedDevices = useHMSStore(selectLocalMediaSettings)
+
+    const [audioInput, setAudioInput] = useState("")
+    const [audioOutput, setAudioOutput] = useState("")
+    const [videoInput, setVideoInput] = useState("")
 
     const FullScreenWithChildren = FullScreen as any
     const fullScreenHandle = useFullScreenHandle();
@@ -315,19 +326,6 @@ const CallOneOnOnePage = () => {
                             </Box>
                             <Box sx={ { width: "98%", m: 2 } }>
                                 <Stack spacing={ 2 }>
-                                    {/* <Card variant="outlined" sx={ { width: "100%", backgroundColor: "error.main" } }>
-                                        <CardContent sx={ { pl: 5, pr: 5 } }>
-                                            <Box>
-                                                <Typography align="justify" >
-                                                    Warning: to end the call or leave the page, use the end call icon only (red),
-                                                    and not the "go back", "reload" or "exit" icon in the browser, otherwise the
-                                                    money stream might not be closed. You can still manually close the money stream
-                                                    in the Settings page just in case it remained open after the call ended.
-                                                </Typography>
-                                            </Box>
-
-                                        </CardContent>
-                                    </Card> */}
                                     <Card variant="outlined" sx={ { width: "100%" } }>
                                         <CardContent sx={ { pl: 5, pr: 5 } }>
                                             { (activeRoomData && !isLoadingActiveRoomData && !activeRoomDataError && params.caller && params.callee && active) ? (
@@ -350,7 +348,7 @@ const CallOneOnOnePage = () => {
                                                         direction={ isMobile ? "column" : "row" }
                                                         alignItems={ isMobile ? "flex-start" : "center" }
                                                     >
-                                                        <Typography>is streaming</Typography>
+                                                        <Typography>streaming</Typography>
                                                         <DisplayFromPerSecondToXXX flowRate={ activeRoomData.flowRate } />
                                                         <Typography>to</Typography>
                                                     </Stack>
@@ -374,8 +372,103 @@ const CallOneOnOnePage = () => {
                                             ) }
                                         </CardContent>
                                     </Card>
+                                    <Card variant="outlined" sx={ { width: "100%" } }>
+                                        <CardHeader
+                                            title="Devices"
+                                            sx={ {
+                                                "&:last-child": {
+                                                    paddingLeft: 24
+                                                }
+                                            } }
+                                        />
+                                        <CardContent sx={ { pl: 5, pr: 5 } }>
+                                            <Stack
+                                                direction='column'
+                                                alignItems='flex-left'
+                                                justifyContent='space-evenly'
+                                                spacing={ 1 }
+                                            >
+                                                <Box sx={ { minWidth: 120 } }>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="devices-label">Audio Input</InputLabel>
+                                                        <Select
+                                                            labelId="devices-label"
+                                                            //   id="demo-simple-select"
+                                                            value={ audioInput }
+                                                            label="Audio Input"
+                                                            onChange={ async (event: SelectChangeEvent) => {
+                                                                const value = event.target.value
+                                                                await hmsActions.setAudioSettings({ deviceId: value });
+                                                                setAudioInput(value)
+                                                            } }
+                                                        >
+                                                            { devices.audioInput.map((item) => (
+                                                                <MenuItem
+                                                                    key={ item.deviceId }
+                                                                    value={ item.deviceId }
+                                                                >
+                                                                    { item.label }
+                                                                </MenuItem>
+                                                            )) }
+                                                        </Select>
+                                                    </FormControl>
+                                                </Box>
+                                                <Box sx={ { minWidth: 120 } }>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="devices-label">Audio Output</InputLabel>
+                                                        <Select
+                                                            labelId="devices-label"
+                                                            //   id="demo-simple-select"
+                                                            value={ audioOutput }
+                                                            label="Audio Output"
+                                                            onChange={ async (event: SelectChangeEvent) => {
+                                                                const value = event.target.value
+                                                                await hmsActions.setAudioOutputDevice(value);
+                                                                setAudioOutput(value)
+                                                            } }
+                                                        >
+                                                            { devices.audioOutput.map((item) => (
+                                                                <MenuItem
+                                                                    key={ item.deviceId }
+                                                                    value={ item.deviceId }
+                                                                >
+                                                                    { item.label }
+                                                                </MenuItem>
+                                                            )) }
+                                                        </Select>
+                                                    </FormControl>
+                                                </Box>
+                                                <Box sx={ { minWidth: 120 } }>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel id="devices-label">Video</InputLabel>
+                                                        <Select
+                                                            labelId="devices-label"
+                                                            //   id="demo-simple-select"
+                                                            value={ videoInput }
+                                                            label="Video"
+                                                            onChange={ async (event: SelectChangeEvent) => {
+                                                                const value = event.target.value
+                                                                await hmsActions.setVideoSettings({ deviceId: value });
+                                                                setVideoInput(value)
+                                                            } }
+                                                        >
+                                                            { devices.videoInput.map((item) => (
+                                                                <MenuItem
+                                                                    key={ item.deviceId }
+                                                                    value={ item.deviceId }
+                                                                >
+                                                                    { item.label }
+                                                                </MenuItem>
+                                                            )) }
+                                                        </Select>
+                                                    </FormControl>
+                                                </Box>
+                                            </Stack>
+                                        </CardContent>
+                                    </Card>
                                 </Stack>
                             </Box>
+                            <Box sx={ { p: 10 } }></Box>
                         </Stack>
                     ) : (
                         <Box>loading peer</Box>
@@ -400,3 +493,9 @@ const CallOneOnOnePage = () => {
 }
 
 export default CallOneOnOnePage
+
+/**
+ *  const [audioInput, setAudioInput] = useState("")
+    const [audioOutput, setAudioOutput] = useState("")
+    const [videoInput, setVideoInput] = useState("")
+ */

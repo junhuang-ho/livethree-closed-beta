@@ -20,9 +20,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Slider from '@mui/material/Slider';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import UploadIcon from '@mui/icons-material/Upload';
-import CircularProgress from '@mui/material/CircularProgress';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import CallIcon from '@mui/icons-material/Call';
@@ -136,6 +136,7 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
     const [closeWarning2, setCloseWarning2] = useState<boolean>(false)
     const [closeWarning3, setCloseWarning3] = useState<boolean>(false)
 
+    const [isProcessing, setIsProcessing] = useState<boolean>(false)
 
     const expiryTimestamp = new Date();
     expiryTimestamp.setSeconds(expiryTimestamp.getSeconds());
@@ -464,67 +465,79 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
                                 </Tooltip>
                             ) }
                             <Box>
-                                <Tooltip title="Video Call">
-                                    <span>
-                                        <StandardButton
-                                            variant="contained"
-                                            color="primary"
-                                            // caller, dataUser, localAddress
-                                            disabled={
-                                                isInitiating || loadingRoomActive ||
-                                                dataRoomActive?.caller === localAddress
-                                                || !minimumBalance || !localAddress
-                                                || !dataUser?.address || !dataUser?.online
-                                                || dataUser?.isActive || hasRoom || inFavPage
-                                                || isCalleeInCall
-                                            }
-                                            onClick={ async () => {
-                                                if (previewMode) {
-                                                    previewMessage()
-                                                } else {
-                                                    reloadUser()
-                                                    if (chainId !== 0 && !isUserLoading && dataUser?.online && !dataUser?.isActive) {
-                                                        // the is online check in if statement doesn't really work
-                                                        // but current system to prevent calls if offline its "good enough"
-                                                        // to work in mosts cases, only edge case is if 
-                                                        // callee is viewing a stale page of a recently logged 
-                                                        // out user and calling them
-                                                        refreshNativeBalance()
-                                                        refreshSFStates()
-                                                        const netFlow = (await getNetFlowTokenX()).toString() // manually run netFlow check just in case
-                                                        const operatorData = await getOperatorData()
-                                                        const hasDeletePermission = operatorData.permissions === DELETE_PERMISSION
-                                                        const tokenXBalance_ = await getTokenXBalance()
-
-                                                        if (!hasDeletePermission) {
-                                                            setDisplayGrantPermissionModal(true)
-                                                            logEvent(analytics, "call_require_grant")
-                                                        } else if (netFlow !== "0") {
-                                                            setDisplayHasNetFlowModal(true)
-                                                            logEvent(analytics, "call_has_existing_flow_caller")
-                                                        } else if (ethers.BigNumber.from(tokenXBalance_).gte(minimumBalance)) {
-                                                            const hasSufficientGas = await hasGasToCreateAndDeleteFlow(dataUser.address, dataUser.flowRate)
-
-                                                            if (hasSufficientGas) {
-                                                                setDisplayStartStreamModal(true)
-                                                                logEvent(analytics, "call_pre_call_details")
-                                                            } else {
-                                                                setDisplayInsufficientGasModal(true)
-                                                                logEvent(analytics, "call_insufficient_gas")
-                                                            }
-
-                                                        } else {
-                                                            setDisplayInsufficientBalanceModal(true)
-                                                            logEvent(analytics, "call_insufficient_funds")
-                                                        }
-                                                    }
+                                { isProcessing ? (
+                                    <Stack
+                                        alignItems='center'
+                                        justifyContent='center'
+                                    >
+                                        <CircularProgress size="33px" />
+                                    </Stack>
+                                ) : (
+                                    <Tooltip title="Video Call">
+                                        <span>
+                                            <StandardButton
+                                                variant="contained"
+                                                color="primary"
+                                                // caller, dataUser, localAddress
+                                                disabled={
+                                                    isInitiating || loadingRoomActive ||
+                                                    dataRoomActive?.caller === localAddress
+                                                    || !minimumBalance || !localAddress
+                                                    || !dataUser?.address || !dataUser?.online
+                                                    || dataUser?.isActive || hasRoom || inFavPage
+                                                    || isCalleeInCall
                                                 }
-                                            } }
-                                        >
-                                            <CallIcon />
-                                        </StandardButton>
-                                    </span>
-                                </Tooltip>
+                                                onClick={ async () => {
+                                                    if (previewMode) {
+                                                        previewMessage()
+                                                    } else {
+                                                        setIsProcessing(true)
+                                                        reloadUser()
+                                                        if (chainId !== 0 && !isUserLoading && dataUser?.online && !dataUser?.isActive) {
+                                                            // the is online check in if statement doesn't really work
+                                                            // but current system to prevent calls if offline its "good enough"
+                                                            // to work in mosts cases, only edge case is if 
+                                                            // callee is viewing a stale page of a recently logged 
+                                                            // out user and calling them
+                                                            refreshNativeBalance()
+                                                            refreshSFStates()
+                                                            const netFlow = (await getNetFlowTokenX()).toString() // manually run netFlow check just in case
+                                                            const operatorData = await getOperatorData()
+                                                            const hasDeletePermission = operatorData.permissions === DELETE_PERMISSION
+                                                            const tokenXBalance_ = await getTokenXBalance()
+
+                                                            if (!hasDeletePermission) {
+                                                                setDisplayGrantPermissionModal(true)
+                                                                logEvent(analytics, "call_require_grant")
+                                                            } else if (netFlow !== "0") {
+                                                                setDisplayHasNetFlowModal(true)
+                                                                logEvent(analytics, "call_has_existing_flow_caller")
+                                                            } else if (ethers.BigNumber.from(tokenXBalance_).gte(minimumBalance)) {
+                                                                const hasSufficientGas = await hasGasToCreateAndDeleteFlow(dataUser.address, dataUser.flowRate)
+
+                                                                if (hasSufficientGas) {
+                                                                    setDisplayStartStreamModal(true)
+                                                                    logEvent(analytics, "call_pre_call_details")
+                                                                } else {
+                                                                    setDisplayInsufficientGasModal(true)
+                                                                    logEvent(analytics, "call_insufficient_gas")
+                                                                }
+
+                                                            } else {
+                                                                setDisplayInsufficientBalanceModal(true)
+                                                                logEvent(analytics, "call_insufficient_funds")
+                                                            }
+                                                        }
+                                                        setIsProcessing(false)
+                                                    }
+                                                } }
+                                            >
+                                                <CallIcon />
+                                            </StandardButton>
+                                        </span>
+                                    </Tooltip>
+                                ) }
+
                                 <DialogGrantPermission
                                     open={ displayGrantPermissionModal } setOpen={ setDisplayGrantPermissionModal }
                                 />

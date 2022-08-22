@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { doc } from "firebase/firestore"
+import { doc, query, where, getDocs } from "firebase/firestore"
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import Grid from "@mui/material/Grid";
@@ -67,6 +67,29 @@ const FavouritesPage = () => {
     //     refreshSFStates()
     //     console.log("refresh states")
     // }, [])
+
+    const [data, setData] = useState<any[]>([]);
+    useEffect(() => {
+        const getDetails = async () => {
+            for (var i = 0; i < dataUserLocal?.favourites.length; i++) {
+                const address = dataUserLocal?.favourites[i]
+                const q = query(COL_REF_USERS, where("address", "==", address));
+                const querySnapshot = await getDocs(q)
+                if (querySnapshot.size === 1) {
+                    console.warn("LiveThree: DB queried - profile card")
+                    querySnapshot.forEach((doc) => {
+                        setData(oldData => [...oldData, doc.data()])
+                    });
+                } else {
+                    console.error("should not return more than 1")
+                }
+            }
+        }
+        if (dataUserLocal && dataUserLocal?.favourites.length > 0) {
+            getDetails()
+        }
+
+    }, [dataUserLocal]);
 
     if (dataUserLocalLoading) {
         return <SplashPage />
@@ -142,24 +165,24 @@ const FavouritesPage = () => {
                             </Box>
                         )) }
                 </Stack>
-                { dataUserLocal?.favourites.length > 0 ? (
+                { data && data.length > 0 ? (
                     <Box sx={ { maxHeight: "85vh", overflow: 'auto' } }>
                         { isMobile ? (
                             <List>
-                                { dataUserLocal?.favourites.map((item: string, index: number) => (
+                                { data.map((item: any) => (
                                     <ListItem
                                         disablePadding
-                                        key={ index }
+                                        key={ item.address }
                                     >
-                                        <ProfileCard address={ item } isMobile={ isMobile } />
+                                        <ProfileCard data={ item } isMobile={ isMobile } />
                                     </ListItem>
                                 )) }
                             </List>
                         ) : (
                             <Grid container spacing={ 2 }>
-                                { dataUserLocal?.favourites.map((item: string, index: number) => (
-                                    <Grid item key={ index } xs={ 12 } sm={ 6 } md={ 3 }>
-                                        <ProfileCard address={ item } isMobile={ isMobile } />
+                                { data.map((item: any) => (
+                                    <Grid item key={ item.address } xs={ 12 } sm={ 6 } md={ 3 }>
+                                        <ProfileCard data={ item } isMobile={ isMobile } />
                                     </Grid>
                                 )) }
                             </Grid>
@@ -172,7 +195,7 @@ const FavouritesPage = () => {
                         justifyContent="center"
                         sx={ { width: "100%", height: "50vh" } }
                     >
-                        no favourites
+                        no follows
                     </Box>
                 ) }
 

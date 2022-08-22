@@ -22,7 +22,7 @@ export const useSearchByAddressOrHandle = (value: string, isSearch: boolean, isS
             }
 
             const querySnapshot = await getDocs(q)
-            console.warn('db searched')
+            console.warn('LiveThree: DB queried - search')
             if (querySnapshot.size === 1) {
                 querySnapshot.forEach((doc) => {
                     setUid(doc.id)

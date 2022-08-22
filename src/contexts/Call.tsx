@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore"
+import { doc, setDoc, getDocs, updateDoc, deleteDoc, serverTimestamp, orderBy, limit, query, where } from "firebase/firestore"
 import { COL_REF_USERS, COL_REF_CALLER_HAS_ROOM, getColRefActive, getColRefHistoryKey, functions, auth, analytics } from '../services/firebase';
 import { logEvent } from 'firebase/analytics';
 
@@ -17,7 +17,7 @@ import useSound from 'use-sound';
 import ringtone from '../assets/ringtone.wav'
 
 import { ROLE_CALLER, ROLE_CALLEE } from '../configs/hms';
-import { CALL_PENDING_EXPIRE_IN_MS, PLACEHOLDER_ADDRESS, END_CALL_BUFFER_SECONDS } from '../configs/general';
+import { CALL_PENDING_EXPIRE_IN_MS, PLACEHOLDER_ADDRESS, END_CALL_BUFFER_SECONDS, CALL_HISTORY_LIMIT } from '../configs/general';
 import { POLYGON_ADDRESS_USDCx, MUMBAI_ADDRESS_fUSDCx } from '../configs/blockchain/superfluid';
 import { CHAIN_ID_POLYGON, CHAIN_ID_MUMBAI } from '../configs/blockchain/web3auth';
 import { ADMIN_ADDRESS } from '../configs/blockchain/admin';
@@ -53,6 +53,7 @@ export interface ICallContext {
     isRingtoneEnabled: boolean
     isCalleeInCall: boolean
     hasRoom: boolean
+    historyData: any
     setIsEntering: (value: boolean) => void
     initiateCall: (calleeAddress: any) => Promise<void>;
     acceptCall: (callerAddress: any, roomId: any) => Promise<void>;
@@ -71,6 +72,7 @@ export const CallContext = createContext<ICallContext>({
     isRingtoneEnabled: true,
     isCalleeInCall: false,
     hasRoom: false,
+    historyData: [],
     setIsEntering: (value: boolean) => { },
     initiateCall: async (calleeAddress: any) => { },
     acceptCall: async (callerAddress: any, roomId: any) => { },
@@ -132,6 +134,49 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
     const [isEnding, setIsEnding] = useState<boolean>(false)
     const [isCallerInCall, setIsCallerInCall] = useState<boolean>(false)
     const [isCalleeInCall, setIsCalleeInCall] = useState<boolean>(false)
+
+    // query historic calls here so that lower cost on db
+    const q = query(getColRefHistoryKey(localAddress || "empty"), orderBy("timestamp", "desc"), limit(CALL_HISTORY_LIMIT))
+    const [historicCalls, loadingHistoricCalls, historicCallsError] = useCollectionData(q);
+    const [historyData, setHistoryData] = useState<any[]>([]);
+    useEffect(() => {
+        const getDetails = async () => {
+            if (!historicCalls) {
+                return
+            }
+            for (var i = 0; i < historicCalls?.length; i++) {
+                const callerAddress = historicCalls?.[i].caller
+                const calleeAddress = historicCalls?.[i].callee
+                const timestamp = historicCalls?.[i].timestamp
+
+                let useAddress: string
+                let isIncomingCall: boolean
+                if (callerAddress !== localAddress) {
+                    useAddress = callerAddress
+                    isIncomingCall = true
+                } else {
+                    useAddress = calleeAddress
+                    isIncomingCall = false
+                }
+
+                const q = query(COL_REF_USERS, where("address", "==", useAddress));
+                const querySnapshot = await getDocs(q)
+                if (querySnapshot.size === 1) {
+                    console.warn("LiveThree: DB queried - history")
+                    querySnapshot.forEach((doc) => {
+                        setHistoryData(oldData => [...oldData, { ...doc.data(), timestamp: timestamp, isIncomingCall: isIncomingCall }])
+                    });
+                } else {
+                    console.error("should not return more than 1")
+                }
+            }
+        }
+        if (historicCalls && historicCalls?.length > 0 && localAddress) {
+            setHistoryData([])
+            getDetails()
+        }
+
+    }, [historicCalls, localAddress]);
 
     //
     // const [turnTapOn, turningOn, turnOnError] = useHttpsCallable(functions, 'turnTapOn');
@@ -507,14 +552,14 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
                 callee: localAddress,
                 calleeToken: tokenData,
                 calleeDisplayName: localUserData?.handle || localAddress || "error_loading_name",
-                calleePicture: localUserData?.photoURL,
                 calleeUid: firebaseUser?.uid,
                 flowRate: localUserData?.flowRate,
             })
 
             hmsActions.join({
                 userName: localUserData?.handle || localAddress || "error_loading_name",
-                authToken: tokenData
+                authToken: tokenData,
+                rememberDeviceSelection: true
             });
 
             setOtherAddress(callerAddress)
@@ -538,7 +583,8 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
             setIsEntering(true)
             hmsActions.join({
                 userName: localUserData?.handle || localAddress || "error_loading_name",
-                authToken: activeRoomData?.callerToken
+                authToken: activeRoomData?.callerToken,
+                rememberDeviceSelection: true
             });
             setIsCallerInCall(true)
             clearPendingCall()
@@ -589,11 +635,11 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         try {
             // set caller history
             await setDoc(doc(getColRefHistoryKey(activeRoomData?.caller), activeRoomData?.roomId),
-                { ...activeRoomData, ...{ timestamp: serverTimestamp() } }
+                { caller: activeRoomData?.caller, callee: activeRoomData?.callee, timestamp: serverTimestamp() }
             )
             // set callee history
             await setDoc(doc(getColRefHistoryKey(activeRoomData?.callee), activeRoomData?.roomId),
-                { ...activeRoomData, ...{ timestamp: serverTimestamp() } }
+                { caller: activeRoomData?.caller, callee: activeRoomData?.callee, timestamp: serverTimestamp() }
             )
         } catch (error) {
             console.error(error)
@@ -758,6 +804,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         isRingtoneEnabled,
         isCalleeInCall,
         hasRoom,
+        historyData,
         setIsEntering,
         initiateCall,
         acceptCall,

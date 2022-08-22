@@ -20,7 +20,7 @@ export const DisplayFromPerSecondToXXX = ({ flowRate }: { flowRate: any }) => {
     const decimal = 4
 
     return (
-        <Stack direction="row" alignItems="center" sx={ { border: 1, borderRadius: 2, pl: 1, pr: 1, m: 1, width: "70%" } }>
+        <Stack direction="row" alignItems="center" sx={ { border: 1, borderRadius: 2, pl: 1, pr: 1, m: 1, width: "80%" } }>
             <ButtonRotate rotate={ next } />
             { tokenXSymbol &&
                 <Typography variant="subtitle1">

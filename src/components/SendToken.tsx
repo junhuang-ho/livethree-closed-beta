@@ -47,7 +47,7 @@ export const SendToken = () => {
     const [isOpenNetFlowModal, setIsOpenNetFlowModal] = useState<boolean>(false)
 
     const { chainId, address: localAddress, nativeCoinBalance } = useWeb3Auth()
-    const { tokenSymbol, tokenXSymbol, transferNative, transferToken, transferTokenX, tokenBalance, tokenXBalance, getNetFlowTokenX } = useSuperfluidGas()
+    const { tokenSymbol, tokenXSymbol, transferNative, transferToken, transferTokenX, tokenBalance, tokenXBalance, getNetFlowTokenX, isTransactionPending } = useSuperfluidGas()
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const action = (snackbarId: any) => (
@@ -231,7 +231,7 @@ export const SendToken = () => {
                                 <StyledGasBadge badgeContent={ <IconGas /> }>
                                     <StandardButton
                                         variant="contained"
-                                        disabled={ isProcessing }
+                                        disabled={ isProcessing || isTransactionPending }
                                         onClick={ async () => {
                                             try {
                                                 setIsProcessing(true)

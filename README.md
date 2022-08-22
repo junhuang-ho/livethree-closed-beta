@@ -21,14 +21,21 @@ ref: https://firebase.google.com/docs/hosting/multisites?authuser=0&hl=en#set_up
 
 -----------
 
+<site-id> === livethree-d1d85 || livethree-landing-page
+
 preview template: firebase hosting:channel:deploy <preview-name> --only <site-id> --expires 1d
 preview example : firebase hosting:channel:deploy test1 --only livethree-landing-page --expires 1d
 
 deploy template: firebase deploy --only hosting:<site-id>
 deploy example: firebase deploy --only hosting:livethree-landing-page
 
-firebase hosting:channel:deploy vite1 --only livethree-d1d85 --expires 1d
+clone = deploy preview to live
+clone template: firebase hosting:clone <SOURCE_SITE_ID>:<SOURCE_CHANNEL_ID> <TARGET_SITE_ID>:live
+clone example: firebase hosting:clone livethree-landing-page:test1 livethree-landing-page:live
+
+firebase hosting:channel:deploy upgrade1 --only livethree-d1d85 --expires 1d
 ------------
+
 
 localhost will run .env.development secrets [yarn start]
 production will run .env.production secrets [yarn run build]
@@ -53,9 +60,9 @@ test
 - upgrade 100ms so dont hit limit
 - upgrade Web3Auth so dont hit limit
 
-- apply SF grant
-- apply polygon grant
-- apply 100ms grant?
+- apply SF grant (in progress Reactor or WavePool)
+- apply polygon grant (meh, need 500 twitter follower)
+- apply 100ms grant? (startup got special starting rates)
 
 - change { isDebugger && <Debugger /> } into  <Debugger2 />
 

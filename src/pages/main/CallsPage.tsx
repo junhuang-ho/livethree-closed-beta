@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useDocumentData, useCollectionData } from 'react-firebase-hooks/firestore';
-import { doc, query, orderBy, limit } from "firebase/firestore"
+import { doc } from "firebase/firestore"
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import Link from '@mui/material/Link';
 import Typography from "@mui/material/Typography";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -16,12 +17,13 @@ import CallEndIcon from '@mui/icons-material/CallEnd';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import { ProfilePicture } from '../../components/profile/ProfilePicture';
 import { SplashPage } from '../utils/SplashPage';
 import { ErrorPage } from '../utils/ErrorPage';
 
-import { COL_REF_USERS, getColRefActive, getColRefHistoryKey } from "../../services/firebase";
+import { COL_REF_USERS, getColRefActive } from "../../services/firebase";
 
 import { auth, analytics } from "../../services/firebase";
 import { logEvent } from 'firebase/analytics';
@@ -35,6 +37,8 @@ import { DialogHasNetFlow } from '../../components/dialogs/DialogHasNetFlow';
 import { PERCENTAGE_TAKE_NUMERATOR } from '../../configs/blockchain/admin';
 
 import { ButtonAcceptIncomingCall } from '../../components/ButtonAcceptIncomingCall'
+import { shortenAddress } from '../../utils';
+import { CALL_HISTORY_LIMIT } from '../../configs/general';
 
 const dateOptions = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' } // https://www.freecodecamp.org/news/how-to-format-dates-in-javascript/
 
@@ -50,16 +54,14 @@ const CallsPage = () => {
     const location = useLocation() as unknown as LocationProps; // https://github.com/reach/router/issues/414#issuecomment-1056839570
 
 
-    const { address: localAddress } = useWeb3Auth()
+    const { address: localAddress, chainId } = useWeb3Auth()
     const [firebaseUser] = useAuthState(auth);
 
     const [localUserData, localUserDataLoading, localUserDataError] = useDocumentData(doc(COL_REF_USERS, firebaseUser?.uid));
 
     const [activeCalls, loadingActiveCalls, activeCallsError] = useCollectionData(getColRefActive(localAddress || "empty"));
-    const q = query(getColRefHistoryKey(localAddress || "empty"), orderBy("timestamp", "desc"), limit(10))
-    const [historicCalls, loadingHistoricCalls, historicCallsError] = useCollectionData(q);
 
-    const { cleanUp, isEntering, isEnding, isCalleeInCall } = useCall()
+    const { cleanUp, isEntering, isEnding, isCalleeInCall, historyData } = useCall()
 
     const [displayHasNetFlowModal, setDisplayHasNetFlowModal] = useState<boolean>(false)
 
@@ -68,7 +70,6 @@ const CallsPage = () => {
     //     refreshSFStates()
     //     console.log("refresh states")
     // }, [])
-
 
     if (localUserDataLoading) {
         return <SplashPage />
@@ -190,11 +191,9 @@ const CallsPage = () => {
                                     }
                                 } }
                             />
-                            { !loadingHistoricCalls && !historicCallsError && historicCalls && historicCalls?.length > 0 ? (
+                            { historyData && historyData?.length <= CALL_HISTORY_LIMIT && historyData?.length > 5 ? (
                                 <List sx={ { maxHeight: "30vh", overflow: "auto" } }>
-                                    { historicCalls.map((item: any, index: number) => (
-                                        // if getting firestore data using query, for some reason data already reversed, historicCalls.reverse().map()
-
+                                    { historyData.map((item: any, index: number) => (
                                         <ListItem
                                             disablePadding
                                             key={ index }
@@ -209,39 +208,25 @@ const CallsPage = () => {
                                                     } }>
                                                         <Stack direction="row" alignItems="center" justifyContent="space-between">
                                                             <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={ 2 }>
-                                                                { item?.caller !== localAddress ? (
-                                                                    // call in
-                                                                    <>
-                                                                        <ProfilePicture image={ item?.callerPicture } width={ 64 } height={ 64 } />
-                                                                        <Stack>
-                                                                            <Typography>{ `${ item?.callerDisplayName }` }</Typography>
-                                                                            <Stack
-                                                                                direction="row"
-                                                                            >
-                                                                                <Tooltip title="call received">
-                                                                                    <CallReceivedIcon color="secondary" />
-                                                                                </Tooltip>
-                                                                                <Typography>{ `${ item?.timestamp?.toDate().toLocaleDateString("en-us", dateOptions) }` }</Typography>
-                                                                            </Stack>
-                                                                        </Stack>
-                                                                    </>
-                                                                ) : (
-                                                                    // call out
-                                                                    <>
-                                                                        <ProfilePicture image={ item?.calleePicture } width={ 64 } height={ 64 } />
-                                                                        <Stack>
-                                                                            <Typography>{ `${ item?.calleeDisplayName }` }</Typography>
-                                                                            <Stack
-                                                                                direction="row"
-                                                                            >
-                                                                                <Tooltip title="call made">
-                                                                                    <CallMadeIcon color="secondary" />
-                                                                                </Tooltip>
-                                                                                <Typography>{ `${ item?.timestamp?.toDate().toLocaleDateString("en-us", dateOptions) }` }</Typography>
-                                                                            </Stack>
-                                                                        </Stack>
-                                                                    </>
-                                                                ) }
+                                                                <ProfilePicture image={ item?.photoURL } width={ 64 } height={ 64 } />
+                                                                <Stack>
+                                                                    <Typography>{ item?.handle ? item?.handle : shortenAddress(item?.address) }</Typography>
+                                                                    <Stack
+                                                                        direction="row"
+                                                                    >
+                                                                        { item?.isIncomingCall ? (
+                                                                            <Tooltip title="call received">
+                                                                                <CallReceivedIcon color="secondary" />
+                                                                            </Tooltip>
+                                                                        ) : (
+                                                                            <Tooltip title="call made">
+                                                                                <CallMadeIcon color="secondary" />
+                                                                            </Tooltip>
+                                                                        ) }
+
+                                                                        <Typography>{ `${ item?.timestamp?.toDate().toLocaleTimeString("en-us", dateOptions) }` }</Typography>
+                                                                    </Stack>
+                                                                </Stack>
                                                             </Stack>
                                                             <Tooltip title="preview profile">
                                                                 <span>
@@ -251,7 +236,7 @@ const CallsPage = () => {
                                                                         disabled={ isEntering || isEnding }
                                                                         sx={ { mr: 1 } }
                                                                         onClick={ () => {
-                                                                            navigate(`/user/${ item.caller !== localAddress ? item.caller : item.callee }`, {
+                                                                            navigate(`/user/${ item?.address }`, {
                                                                                 state: {
                                                                                     from: location,
                                                                                 }
@@ -272,18 +257,54 @@ const CallsPage = () => {
                                     )) }
                                 </List>
                             ) : (
-                                <Typography
-                                    sx={ {
-                                        pt: 1,
-                                        pl: 3,
-                                        pb: 1,
-                                    } }
-                                >no recent calls</Typography>
+                                <Box>
+                                    { historyData?.length <= CALL_HISTORY_LIMIT ? (
+                                        <Typography
+                                            sx={ {
+                                                pt: 1,
+                                                pl: 3,
+                                                pb: 1,
+                                            } }
+                                        >
+                                            no recent calls
+                                        </Typography>
+                                    ) : (
+                                        <Typography
+                                            sx={ {
+                                                pt: 1,
+                                                pl: 3,
+                                                pb: 1,
+                                            } }
+                                        >
+                                            error loading call history | { historyData?.length }
+                                        </Typography>
+                                        // to catch bugs
+                                    ) }
+                                </Box>
                             ) }
                         </Card>
                     </Stack>
                 ) : (null) }
             </Box>
+            <Link
+                href={ chainId === 137 ?
+                    `https://polygonscan.com/address/${ localAddress }` :
+                    `https://mumbai.polygonscan.com/address/${ localAddress }`
+                }
+                target="_blank"
+                rel="noopener"
+            >
+                <Stack
+                    direction='row'
+                    alignItems='center'
+                >
+                    view transactions on block explorer
+                    <OpenInNewIcon
+                        fontSize='small'
+                        color='primary'
+                    />
+                </Stack>
+            </Link>
         </Stack >
     )
 }

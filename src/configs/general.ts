@@ -13,6 +13,8 @@ export const ZERO_BYTES = "0x"
 export const GAS_LIMIT_MULTIPLIER_NUMERATOR = 80
 export const GAS_LIMIT_MULTIPLIER_DENOMINATOR = 100
 
+export const CALL_HISTORY_LIMIT = 10
+
 // const isMobile = useResponsive('down', 'sm');
 // const isPartial = useResponsive('between', '', 'sm', 'lg');
 // const isWide = useResponsive('up', 'lg');

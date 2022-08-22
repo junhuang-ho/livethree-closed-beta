@@ -10,10 +10,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 
-import { useState, useEffect } from "react";
-import { query, where, getDocs } from "firebase/firestore"
 import { useNavigate, useLocation } from 'react-router-dom';
-import { COL_REF_USERS } from '../services/firebase'
 
 import placeholder_image from '../assets/placeholder_image.jpg'
 
@@ -23,30 +20,9 @@ type LocationProps = {
     };
 };
 
-export const ProfileCard = ({ address, isMobile }: { address: string, isMobile: boolean | null }) => {
+export const ProfileCard = ({ data, isMobile }: any) => {
     const navigate = useNavigate();
     const location = useLocation() as unknown as LocationProps; // https://github.com/reach/router/issues/414#issuecomment-1056839570
-
-    const [data, setData] = useState<any>(null)
-
-    useEffect(() => {
-        const getDetails = async () => {
-            // TODO: is there a better way to do this than query?
-            const q = query(COL_REF_USERS, where("address", "==", address));
-            const querySnapshot = await getDocs(q)
-            if (querySnapshot.size === 1) {
-                querySnapshot.forEach((doc) => {
-                    setData(doc.data())
-                });
-            } else {
-                console.error("should not return more than 1")
-            }
-        }
-        if (address) {
-            getDetails()
-        }
-
-    }, [address])
 
     return (
         <Box sx={ { width: "100%" } }>
@@ -82,7 +58,6 @@ export const ProfileCard = ({ address, isMobile }: { address: string, isMobile: 
                             navigate(`/user/${ data?.address }`, {
                                 state: {
                                     from: location,
-                                    // address: data?.address,
                                     previewMode: false,
                                     favourited: true
                                 }
