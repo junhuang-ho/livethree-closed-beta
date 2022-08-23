@@ -100,58 +100,58 @@ const CallsPage = () => {
                             { !loadingActiveCalls && !activeCallsError && activeCalls && activeCalls?.length > 0 ? (
                                 <List sx={ { maxHeight: "30vh", overflow: "auto" } }>
                                     { activeCalls.sort((a, b) => b.callStartTimestamp - a.callStartTimestamp).map((item: any, index: number) => (
-                                        <Box>
+
+                                        <ListItem
+                                            disablePadding
+                                            key={ item?.roomId }
+                                            divider
+                                        >
                                             { !item?.callee &&
-                                                <ListItem
-                                                    disablePadding
-                                                    key={ item.roomId }
-                                                    divider
-                                                >
-                                                    <Stack spacing={ 1 } alignItems="center" justifyContent="center" sx={ { width: "100%" } } >
-                                                        <Card sx={ { borderRadius: 0, width: "100%" } }>
-                                                            <CardContent sx={ {
-                                                                p: 1, "&:last-child": {
-                                                                    paddingBottom: 0
-                                                                }
-                                                            } }>
-                                                                <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                                                    <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={ 2 }>
-                                                                        <ProfilePicture image={ item?.callerPicture } width={ 64 } height={ 64 } />
-                                                                        <Typography>{ `${ item?.callerDisplayName }` }</Typography>
-                                                                    </Stack>
-                                                                    <Stack direction="row" alignItems="center" spacing={ 1 } sx={ { mr: 1 } }>
-                                                                        <Tooltip title="Accept Incoming Video Call">
-                                                                            <span>
-                                                                                <ButtonAcceptIncomingCall
-                                                                                    caller={ item?.caller } callerChainId={ item?.callerChainId } roomId={ item?.roomId }
-                                                                                    callStartTimestamp={ item?.callStartTimestamp }
-                                                                                    setDisplayHasNetFlowModal={ setDisplayHasNetFlowModal }
-                                                                                />
-                                                                            </span>
-                                                                        </Tooltip>
-                                                                        <Tooltip title="Reject Incoming Video Call">
-                                                                            <span>
-                                                                                <StandardButton
-                                                                                    variant="contained"
-                                                                                    disabled={ isEntering || isEnding }
-                                                                                    onClick={ async () => {
-                                                                                        await cleanUp(localAddress, item.caller, false, "reject call", true)
-                                                                                        logEvent(analytics, "call_rejected")
-                                                                                    } }
-                                                                                    color="error"
-                                                                                >
-                                                                                    <CallEndIcon />
-                                                                                </StandardButton>
-                                                                            </span>
-                                                                        </Tooltip>
-                                                                    </Stack>
+                                                <Stack spacing={ 1 } alignItems="center" justifyContent="center" sx={ { width: "100%" } } >
+                                                    <Card sx={ { borderRadius: 0, width: "100%" } }>
+                                                        <CardContent sx={ {
+                                                            p: 1, "&:last-child": {
+                                                                paddingBottom: 0
+                                                            }
+                                                        } }>
+                                                            <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                                                <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={ 2 }>
+                                                                    <ProfilePicture image={ item?.callerPicture } width={ 64 } height={ 64 } />
+                                                                    <Typography>{ `${ item?.callerDisplayName }` }</Typography>
                                                                 </Stack>
-                                                            </CardContent>
-                                                        </Card>
-                                                    </Stack>
-                                                </ListItem>
+                                                                <Stack direction="row" alignItems="center" spacing={ 1 } sx={ { mr: 1 } }>
+                                                                    <Tooltip title="Accept Incoming Video Call">
+                                                                        <span>
+                                                                            <ButtonAcceptIncomingCall
+                                                                                caller={ item?.caller } callerChainId={ item?.callerChainId } roomId={ item?.roomId }
+                                                                                callStartTimestamp={ item?.callStartTimestamp }
+                                                                                setDisplayHasNetFlowModal={ setDisplayHasNetFlowModal }
+                                                                            />
+                                                                        </span>
+                                                                    </Tooltip>
+                                                                    <Tooltip title="Reject Incoming Video Call">
+                                                                        <span>
+                                                                            <StandardButton
+                                                                                variant="contained"
+                                                                                disabled={ isEntering || isEnding }
+                                                                                onClick={ async () => {
+                                                                                    await cleanUp(localAddress, item.caller, false, "reject call", true)
+                                                                                    logEvent(analytics, "call_rejected")
+                                                                                } }
+                                                                                color="error"
+                                                                            >
+                                                                                <CallEndIcon />
+                                                                            </StandardButton>
+                                                                        </span>
+                                                                    </Tooltip>
+                                                                </Stack>
+                                                            </Stack>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Stack>
                                             }
-                                        </Box>
+                                        </ListItem>
+
                                     )) }
                                 </List>
                             ) : (
@@ -224,7 +224,7 @@ const CallsPage = () => {
                                                                             </Tooltip>
                                                                         ) }
 
-                                                                        <Typography>{ `${ item?.timestamp?.toDate().toLocaleTimeString("en-us", dateOptions) }` }</Typography>
+                                                                        <Typography>{ item?.timestamp ? item?.timestamp?.toDate().toLocaleTimeString("en-us", dateOptions) : "" }</Typography>
                                                                     </Stack>
                                                                 </Stack>
                                                             </Stack>
@@ -276,7 +276,7 @@ const CallsPage = () => {
                                                 pb: 1,
                                             } }
                                         >
-                                            error loading call history | { historyData?.length }
+                                            error loading call history, please refresh page | { historyData?.length }
                                         </Typography>
                                         // to catch bugs
                                     ) }

@@ -1,3 +1,5 @@
+// import { useEffect } from "react";
+
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack"
 
@@ -14,7 +16,13 @@ import { ChangePassword } from "../../components/ChangePassword";
 import { ExposeSecrets } from "../../components/ExposeSecrets";
 import { Logout } from "../../components/Logout";
 
+// import { useWeb3Auth } from "../../contexts/Web3Auth";
+// import { useSuperfluidGas } from "../../contexts/SuperfluidGas";
+
 const SettingsPage = () => {
+    // const { refreshNativeBalance } = useWeb3Auth()
+    // const { refreshSFStates } = useSuperfluidGas()
+
     // useEffect(() => {  // doesn't really work as WalletDisplay component not in focus?
     //     refreshNativeBalance()
     //     refreshSFStates()

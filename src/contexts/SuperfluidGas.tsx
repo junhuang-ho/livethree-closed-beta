@@ -250,7 +250,6 @@ export const SuperfluidGasProvider = ({ children }: { children: JSX.Element }) =
             if (operatorData) {
                 setHasDeletePermission(operatorData.permissions === DELETE_PERMISSION)
             }
-
         }
         if (chainId && localAddress && tokenAddress && cERC20 && cSuperToken) {
             init()

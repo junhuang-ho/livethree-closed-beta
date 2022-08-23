@@ -139,6 +139,13 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
     const q = query(getColRefHistoryKey(localAddress || "empty"), orderBy("timestamp", "desc"), limit(CALL_HISTORY_LIMIT))
     const [historicCalls, loadingHistoricCalls, historicCallsError] = useCollectionData(q);
     const [historyData, setHistoryData] = useState<any[]>([]);
+    const [alreadyRan, setAlreadyRan] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (historicCalls && historicCalls?.length > 0) {
+            setHistoryData(oldArray => [])
+        }
+    }, [historicCalls, localAddress])
     useEffect(() => {
         const getDetails = async () => {
             if (!historicCalls) {
@@ -170,13 +177,15 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
                     console.error("should not return more than 1")
                 }
             }
+            setAlreadyRan(false)
         }
-        if (historicCalls && historicCalls?.length > 0 && localAddress) {
-            setHistoryData([])
+        if (historyData.length === 0 && historicCalls && localAddress && !alreadyRan) {
+            setAlreadyRan(true)
             getDetails()
         }
 
-    }, [historicCalls, localAddress]);
+
+    }, [historyData, alreadyRan, historicCalls, localAddress]);
 
     //
     // const [turnTapOn, turningOn, turnOnError] = useHttpsCallable(functions, 'turnTapOn');
@@ -196,15 +205,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
     }, [isConnectedToRoom])
 
     useEffect(() => { // TODO: some cases if history not proper, it will have bug, checkout: https://stackoverflow.com/a/60055110
-        // console.log("location changed!")
-        // console.log(location.state?.from?.pathname)
-        // console.log(prevLocation?.state?.from?.pathname)
         const prevLocation_ = prevLocation?.state?.from?.pathname
-        // console.log(prevLocation_)
-        // console.log(typeof prevLocation_)
-        // console.log(prevLocation_?.split("/"))
-        // console.log(prevLocation_?.split("/")[0])
-        // console.log(prevLocation_?.split("/")[1])
 
         if (isCallerInCall && prevLocation_?.split("/")[1] === 'user') {
             endActiveCallFromCaller()
@@ -218,7 +219,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
     useEffect(() => {
         let isAccessed = false
         activeCalls?.reverse().map((item: any, index: number) => {
-            const useKey = <div key={ index }></div>
+            // const useKey = <div key={ index }></div>
 
             if (item?.callee) { // note: this setup means there can only be 1 active call at a time
                 setIsCalleeInCall(true) // why set here instead of on join call clicked? because it needs to reflect in all tabs for same user
