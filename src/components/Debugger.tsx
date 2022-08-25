@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Fab from '@mui/material/Fab';
 import Box from '@mui/material/Box';
@@ -10,6 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import Typography from '@mui/material/Typography';
 import BugReportIcon from '@mui/icons-material/BugReport';
 
 import { useResponsive } from '../hooks/useResponsive';
@@ -73,6 +74,7 @@ export const Debugger = () => {
                     p: 4,
                 } }>
                     <Stack spacing={ 3 }>
+                        <Typography>Developer Tools</Typography>
                         <FormControl fullWidth>
                             <InputLabel id="select-network">Network</InputLabel>
                             <Select

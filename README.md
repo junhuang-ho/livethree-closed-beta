@@ -33,7 +33,9 @@ clone = deploy preview to live
 clone template: firebase hosting:clone <SOURCE_SITE_ID>:<SOURCE_CHANNEL_ID> <TARGET_SITE_ID>:live
 clone example: firebase hosting:clone livethree-landing-page:test1 livethree-landing-page:live
 
-firebase hosting:channel:deploy upgrade3 --only livethree-d1d85 --expires 1d
+firebase hosting:channel:deploy upgrade4 --only livethree-d1d85 --expires 1d
+
+firebase hosting:clone livethree-d1d85:upgrade5 livethree-d1d85:live
 ------------
 
 

@@ -4,8 +4,7 @@ import { styled } from '@mui/material/styles';
 import { NavigationLayout } from './NavigationLayout';
 
 import { Guide } from '../components/Guide';
-// import { Debugger } from '../components/Debugger';
-import { Debugger2 } from '../components/Debugger2';
+import { Debugger } from '../components/Debugger';
 import { WalletDisplay } from '../components/WalletDisplay';
 
 import { useCall } from '../contexts/Call';
@@ -59,8 +58,7 @@ export const MainLayout = () => {
             </MainStyle>
             <WalletDisplay />
             <Guide />
-            {/* { isDebugger && <Debugger /> } */ }
-            <Debugger2 />
+            { isDebugger && <Debugger /> }
         </RootStyle>
     )
 }

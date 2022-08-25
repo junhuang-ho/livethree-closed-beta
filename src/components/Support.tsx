@@ -32,14 +32,14 @@ export const Support = () => {
                     <Stack direction="row">
                         <IconButton
                             onClick={ () => {
-                                window.open("https://twitter.com/livethreeweb");
+                                window.open("https://twitter.com/livethreeweb", '_blank', 'noopener');
                             } }
                         >
                             <img src={ twitter } style={ { width: "30px" } } />
                         </IconButton>
                         <IconButton
                             onClick={ () => {
-                                window.open("https://discord.gg/EhFcudaE37");
+                                window.open("https://discord.gg/EhFcudaE37", '_blank', 'noopener');
                             } }
                         >
                             <img src={ discord } style={ { width: "30px" } } />

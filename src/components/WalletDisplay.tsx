@@ -45,7 +45,7 @@ export const WalletDisplay = () => {
             } }
         >
             <Typography align="center">
-                <Box component="span" fontWeight='fontWeightMedium' display='inline'>THERE ARE OPEN STREAMS</Box>
+                <Box component="span" fontWeight='fontWeightMedium' display='inline'>MONEY STREAM ACTIVE</Box>
             </Typography>
             <Typography align="center">
                 <Box component="span" fontWeight='fontWeightMedium' display='inline'>NET FLOW { ethers.utils.formatEther(netFlow) }</Box>

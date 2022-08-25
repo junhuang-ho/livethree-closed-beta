@@ -69,28 +69,28 @@ export const BuyToken = () => {
                     >
                         <Button
                             onClick={ () => {
-                                window.open("https://buy.ramp.network/");
+                                window.open("https://buy.ramp.network/", '_blank', 'noopener');
                             } }
                         >
                             <img src={ rampIcon } />
                         </Button>
                         <Button
                             onClick={ () => {
-                                window.open("https://www.moonpay.com/buy")
+                                window.open("https://www.moonpay.com/buy", '_blank', 'noopener')
                             } }
                         >
                             <img src={ moonpayIcon } style={ { width: '155px' } } />
                         </Button>
                         <Button
                             onClick={ () => {
-                                window.open("https://global.transak.com/?utm_campaign=Website%20Conversions&utm_source=homePage&utm_medium=menu&utm_term=buy-crypto")
+                                window.open("https://global.transak.com/?utm_campaign=Website%20Conversions&utm_source=homePage&utm_medium=menu&utm_term=buy-crypto", '_blank', 'noopener')
                             } }
                         >
                             <img src={ transakIcon } style={ { width: '150px' } } />
                         </Button>
                         <Button
                             onClick={ () => {
-                                window.open("https://buy-crypto.chainbits.com/")
+                                window.open("https://buy-crypto.chainbits.com/", '_blank', 'noopener')
                             } }
                         >
                             <img src={ simplexIcon } style={ { width: '150px' } } />
