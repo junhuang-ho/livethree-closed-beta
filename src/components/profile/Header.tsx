@@ -29,7 +29,7 @@ import CallIcon from '@mui/icons-material/Call';
 import Tooltip from '@mui/material/Tooltip';
 import ErrorIcon from '@mui/icons-material/Error';
 import CloseIcon from '@mui/icons-material/Close';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+// import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 import { ButtonRefresh } from '../ButtonRefresh';
 import { IconGas } from '../IconGas';
@@ -313,8 +313,8 @@ export const Header = ({ uid, dataUser, showcaseMode, isUserLoading, reloadUser,
 
                                 { !editHeader &&
                                     <Stack direction="row" alignItems="center">
-                                        <FiberManualRecordIcon fontSize="inherit" sx={ { color: dataUser?.online ? "#30ef63" : "#808080" } } />
-                                        <Typography>{ dataUser?.online ? "online" : "offline" }</Typography>
+                                        {/* <FiberManualRecordIcon fontSize="inherit" sx={ { color: dataUser?.online ? "#30ef63" : "#808080" } } /> */ }
+                                        {/* <Typography>{ dataUser?.online ? "online" : "offline" }</Typography> */ }
                                         <Typography>{ dataUser?.isActive ? " [in call]" : "" }</Typography>
                                     </Stack>
                                 }
