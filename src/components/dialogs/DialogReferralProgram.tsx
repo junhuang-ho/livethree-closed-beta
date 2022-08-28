@@ -42,7 +42,8 @@ export const DialogReferralProgram = ({ open, setOpen, count }: any) => {
                 <DialogContentText align="justify">
                     You will earn a <Box component="span" fontWeight='fontWeightMedium' display='inline'>{ PERCENTAGE_TAKE_NUMERATOR - PERCENTAGE_TAKE_NUMERATOR_PROMO1 }% reduction </Box>
                     in LiveThree percentage take for the next <Box component="span" fontWeight='fontWeightMedium' display='inline'>{ PROMO1_COUNT } call(s) </Box>
-                    for every referee who signs up and makes or receives a money streaming video call for at least { REFERRAL_MIN_DURATION_S + 5 } seconds
+                    for <Box component="span" fontWeight='fontWeightMedium' display='inline'>every </Box>
+                    referee who signs up and makes or receives a money streaming video call for at least { REFERRAL_MIN_DURATION_S + 5 } seconds
                     through your referral link.
                 </DialogContentText>
                 <Box sx={ { p: 1 } }></Box>
@@ -59,9 +60,10 @@ export const DialogReferralProgram = ({ open, setOpen, count }: any) => {
                     </DialogContentText>
                     <ButtonCopy value={ `${ window.location.origin }/r/${ localAddress }` } msg={ 'Referral link' } />
                 </Stack>
+                <Box sx={ { p: 1 } }></Box>
                 { count > 0 &&
                     <DialogContentText align="justify">
-                        You currently have { count }
+                        You currently have { count } discounted call(s) remaining.
                     </DialogContentText>
                 }
             </DialogContent>
