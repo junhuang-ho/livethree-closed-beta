@@ -5,4 +5,4 @@ export const PERCENTAGE_TAKE_DENOMINATOR = 100
 
 export const PERCENTAGE_TAKE_NUMERATOR_PROMO1 = 5
 
-export const PROMO1_COUNT = 2 // TODO: change firestore rules if change this value!!
+export const PROMO1_COUNT = 5 // TODO: change firestore rules if change this value!!
