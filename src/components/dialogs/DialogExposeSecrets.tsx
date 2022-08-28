@@ -61,8 +61,7 @@ export const DialogExposeSecrets = ({ open, setOpen, privateKey }: any) => {
                     Warning: Never disclose this key. Anyone with your private keys can
                     steal any assets held in your account. LiveThree would
                     <Box component="span" fontWeight='fontWeightMedium' display='inline'> never </Box>
-                    ask for
-                    your private keys.
+                    ask for your private keys (or password).
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
