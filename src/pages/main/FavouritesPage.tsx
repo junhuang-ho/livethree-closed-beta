@@ -70,7 +70,21 @@ const FavouritesPage = () => {
 
     const [data, setData] = useState<any[]>([]);
     useEffect(() => {
+        const appendData = async () => {
+            const address = dataUserLocal?.favourites[dataUserLocal?.favourites.length - 1]
+            const q = query(COL_REF_USERS, where("address", "==", address));
+            const querySnapshot = await getDocs(q)
+            if (querySnapshot.size === 1) {
+                console.warn("LiveThree: DB queried - profile card")
+                querySnapshot.forEach((doc) => {
+                    setData(oldData => [...oldData, doc.data()])
+                });
+            } else {
+                console.error("should not return more than 1")
+            }
+        }
         const getDetails = async () => {
+            setData([])
             for (var i = 0; i < dataUserLocal?.favourites.length; i++) {
                 const address = dataUserLocal?.favourites[i]
                 const q = query(COL_REF_USERS, where("address", "==", address));
@@ -85,7 +99,9 @@ const FavouritesPage = () => {
                 }
             }
         }
-        if (dataUserLocal && dataUserLocal?.favourites.length > 0) {
+        if (data.length !== 0 && dataUserLocal?.favourites.length === data.length + 1) {
+            appendData()
+        } else if (dataUserLocal && dataUserLocal?.favourites.length > 0) {
             getDetails()
         }
 

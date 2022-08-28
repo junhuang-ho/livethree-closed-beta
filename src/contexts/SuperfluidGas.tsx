@@ -7,6 +7,8 @@ import { useInterval } from 'react-use';
 import { useSnackbar } from 'notistack';
 import { useIdleTimer } from 'react-idle-timer'
 
+import { COL_REF_PROMO1 } from '../services/firebase';
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { CHAIN_ID_POLYGON, CHAIN_ID_MUMBAI } from '../configs/blockchain/web3auth';
 import { BYTES, ZERO_BYTES, GAS_LIMIT_MULTIPLIER_NUMERATOR, GAS_LIMIT_MULTIPLIER_DENOMINATOR } from '../configs/general';
 
@@ -42,6 +44,7 @@ import {
     ADMIN_ADDRESS,
     PERCENTAGE_TAKE_NUMERATOR,
     PERCENTAGE_TAKE_DENOMINATOR,
+    PERCENTAGE_TAKE_NUMERATOR_PROMO1,
 } from '../configs/blockchain/admin';
 
 export interface ISuperfluidGasContext {
@@ -436,9 +439,17 @@ export const SuperfluidGasProvider = ({ children }: { children: JSX.Element }) =
         return txParameters
     }
 
-    const createFlowInternal = (receiver: string, flowRate: string) => {
+    const createFlowInternal = (receiver: string, flowRate: string, isPromo1: boolean) => {
         const flowRateBN = ethers.BigNumber.from(flowRate)
-        const flowRateFee = flowRateBN.mul(PERCENTAGE_TAKE_NUMERATOR).div(PERCENTAGE_TAKE_DENOMINATOR)
+
+        let percentageTakeNumerator
+        if (isPromo1) {
+            percentageTakeNumerator = PERCENTAGE_TAKE_NUMERATOR_PROMO1
+        } else {
+            percentageTakeNumerator = PERCENTAGE_TAKE_NUMERATOR
+        }
+
+        const flowRateFee = flowRateBN.mul(percentageTakeNumerator).div(PERCENTAGE_TAKE_DENOMINATOR)
         const flowRateReceiver = flowRateBN.sub(flowRateFee)
 
         const dataReceiver = iCFAV1.encodeFunctionData("createFlow", [
@@ -466,27 +477,19 @@ export const SuperfluidGasProvider = ({ children }: { children: JSX.Element }) =
 
         setIsCreatingFlow(true)
 
-        // const flowRateBN = ethers.BigNumber.from(flowRate)
-        // const flowRateFee = flowRateBN.mul(PERCENTAGE_TAKE_NUMERATOR).div(PERCENTAGE_TAKE_DENOMINATOR)
-        // const flowRateReceiver = flowRateBN.sub(flowRateFee)
+        // referral check
+        let isPromo: boolean = false
+        const docRef = doc(COL_REF_PROMO1, receiver)
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data()
+            if (data.count > 0) {
+                updateDoc(docRef, { count: increment(-1) }) // decrement
+                isPromo = true
+            }
+        }
 
-        // const dataReceiver = iCFAV1.encodeFunctionData("createFlow", [
-        //     tokenXAddress,
-        //     receiver,
-        //     flowRateReceiver.toString(),
-        //     ZERO_BYTES,
-        // ])
-
-        // const dataFee = iCFAV1.encodeFunctionData("createFlow", [
-        //     tokenXAddress,
-        //     ADMIN_ADDRESS,
-        //     flowRateFee.toString(),
-        //     ZERO_BYTES,
-        // ])
-
-        // const txParameters = batchCall(dataReceiver, dataFee)
-
-        const txParameters = createFlowInternal(receiver, flowRate)
+        const txParameters = createFlowInternal(receiver, flowRate, isPromo)
         await executeTransaction(txParameters, true, false)
         logEvent(analytics, "create_flow")
     }
@@ -550,8 +553,8 @@ export const SuperfluidGasProvider = ({ children }: { children: JSX.Element }) =
             return
         }
 
-        const txParametersCreateFlow = createFlowInternal(receiver, flowRate)
-        const txParametersDeleteFlow = deleteFlowInternal(localAddress, receiver)
+        const txParametersCreateFlow = createFlowInternal(receiver, flowRate, false)
+        // const txParametersDeleteFlow = deleteFlowInternal(localAddress, receiver)
 
         const txParamCreateFlow = { ...txParametersCreateFlow, ...{ from: localAddress, } }
         // const txParamDeleteFlow = { ...txParametersDeleteFlow, ...{ from: localAddress, } }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { setDoc, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore" // 
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore" // 
 import { auth, analytics } from '../../services/firebase';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import { logEvent } from 'firebase/analytics';

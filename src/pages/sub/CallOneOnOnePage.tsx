@@ -103,7 +103,7 @@ const CallOneOnOnePage = () => {
 
     const [activeRoomData, isLoadingActiveRoomData, activeRoomDataError] = useDocumentData(doc(getColRefActive(params.callee!), params.caller!));
 
-    const { cleanUp, clearActiveCall, activeCallMaxSeconds, setIsEntering } = useCall()
+    const { cleanUp, clearActiveCallBatch, activeCallMaxSeconds, setIsEntering } = useCall()
     const isMobile = useResponsive('down', 'sm');
 
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -309,7 +309,7 @@ const CallOneOnOnePage = () => {
                                                                 onClick={ async () => {
                                                                     await cleanUp(params.callee!, params.caller!, true, "end call")
                                                                     logEvent(analytics, "call_end")
-                                                                    clearActiveCall()
+                                                                    clearActiveCallBatch()
                                                                 } }
                                                             >
                                                                 <CallEndIcon />

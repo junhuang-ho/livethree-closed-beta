@@ -23,7 +23,7 @@ import { ProfilePicture } from '../../components/profile/ProfilePicture';
 import { SplashPage } from '../utils/SplashPage';
 import { ErrorPage } from '../utils/ErrorPage';
 
-import { COL_REF_USERS, getColRefActive } from "../../services/firebase";
+import { COL_REF_PROMO1, COL_REF_USERS, getColRefActive } from "../../services/firebase";
 
 import { auth, analytics } from "../../services/firebase";
 import { logEvent } from 'firebase/analytics';
@@ -34,7 +34,7 @@ import { useCall } from '../../contexts/Call'
 import { StandardButton } from '../../components/utils';
 import { DialogHasNetFlow } from '../../components/dialogs/DialogHasNetFlow';
 
-import { PERCENTAGE_TAKE_NUMERATOR } from '../../configs/blockchain/admin';
+import { PERCENTAGE_TAKE_NUMERATOR, PERCENTAGE_TAKE_NUMERATOR_PROMO1 } from '../../configs/blockchain/admin';
 
 import { ButtonAcceptIncomingCall } from '../../components/ButtonAcceptIncomingCall'
 import { shortenAddress } from '../../utils';
@@ -58,6 +58,7 @@ const CallsPage = () => {
     const [firebaseUser] = useAuthState(auth);
 
     const [localUserData, localUserDataLoading, localUserDataError] = useDocumentData(doc(COL_REF_USERS, firebaseUser?.uid));
+    const [promo1Data] = useDocumentData(doc(COL_REF_PROMO1, localAddress));
 
     const [activeCalls, loadingActiveCalls, activeCallsError] = useCollectionData(getColRefActive(localAddress || "empty"));
 
@@ -165,16 +166,32 @@ const CallsPage = () => {
                             ) }
                             {
                                 activeCalls && ((!isCalleeInCall && activeCalls?.length > 0) || (isCalleeInCall && activeCalls?.length > 1)) &&
-                                <Typography
-                                    variant="caption"
-                                    sx={ {
-                                        pt: 1,
-                                        pl: 3,
-                                        pb: 1,
-                                    } }
-                                >
-                                    *LiveThree takes { PERCENTAGE_TAKE_NUMERATOR }% of every call.
-                                </Typography>
+
+                                <Box>
+                                    { promo1Data?.count > 0 ? (
+                                        <Typography
+                                            variant="caption"
+                                            sx={ {
+                                                pt: 1,
+                                                pl: 3,
+                                                pb: 1,
+                                            } }
+                                        >
+                                            *LiveThree only takes { PERCENTAGE_TAKE_NUMERATOR_PROMO1 }% on your next call.
+                                        </Typography>
+                                    ) : (
+                                        <Typography
+                                            variant="caption"
+                                            sx={ {
+                                                pt: 1,
+                                                pl: 3,
+                                                pb: 1,
+                                            } }
+                                        >
+                                            *LiveThree takes { PERCENTAGE_TAKE_NUMERATOR }% of every call.
+                                        </Typography>
+                                    ) }
+                                </Box>
                             }
                             <DialogHasNetFlow
                                 open={ displayHasNetFlowModal } setOpen={ setDisplayHasNetFlowModal }
@@ -191,7 +208,7 @@ const CallsPage = () => {
                                     }
                                 } }
                             />
-                            { historyData && historyData?.length <= CALL_HISTORY_LIMIT && historyData?.length > 5 ? (
+                            { historyData && historyData?.length <= CALL_HISTORY_LIMIT ? ( // && historyData?.length > 5
                                 <List sx={ { maxHeight: "30vh", overflow: "auto" } }>
                                     { historyData.map((item: any, index: number) => (
                                         <ListItem

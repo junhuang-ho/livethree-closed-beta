@@ -28,6 +28,8 @@ export const COL_REF_ROOMS = collection(db, 'rooms')
 export const COL_REF_HISTORY = collection(db, 'history')
 export const COL_REF_CALLER_HAS_ROOM = collection(db, 'callerHasRoom')
 export const COL_REF_HANDLES = collection(db, 'handle')
+export const COL_REF_REFERRALS = collection(db, 'referrals')
+export const COL_REF_PROMO1 = collection(db, 'promo1')
 
 export const getColRefActive = (callee: string) => {
     return collection(COL_REF_ROOMS, callee, 'active')

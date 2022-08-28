@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ErrorIcon from '@mui/icons-material/Error';
-// import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconGas } from './IconGas'
 import { ButtonRefresh } from './ButtonRefresh';
@@ -193,8 +192,7 @@ export const WalletDisplay = () => {
                         </Stack>
                     </Box>
                 </Box >
-            )
-            }
+            ) }
         </Box >
 
     )

@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 
 import { NavigationLayout } from './NavigationLayout';
 
+import { Referral } from '../components/Referral';
 import { Guide } from '../components/Guide';
 import { Debugger } from '../components/Debugger';
 import { WalletDisplay } from '../components/WalletDisplay';
@@ -57,6 +58,7 @@ export const MainLayout = () => {
                 <Outlet />
             </MainStyle>
             <WalletDisplay />
+            <Referral />
             <Guide />
             { isDebugger && <Debugger /> }
         </RootStyle>

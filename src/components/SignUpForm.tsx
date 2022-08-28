@@ -3,6 +3,7 @@ import { useFormik, Form, FormikProvider } from 'formik'; // TODO: try react-hoo
 import * as Yup from 'yup';
 import { LoadingButton } from '@mui/lab';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -10,20 +11,29 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { auth, analytics } from "../services/firebase";
+import { setDoc, doc } from "firebase/firestore"
+import { auth, analytics, COL_REF_REFERRALS } from "../services/firebase";
 import { logEvent } from 'firebase/analytics';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useWeb3Auth } from '../contexts/Web3Auth';
+import { useSnackbar } from 'notistack';
+import { createUserWithEmailAndPassword, browserSessionPersistence } from 'firebase/auth';
 
-import { browserSessionPersistence } from 'firebase/auth';
-import { useEffect } from 'react';
-
-export const SignUpForm = ({ createUserWithEmailAndPassword, setIsSubmitting }: any) => {
+export const SignUpForm = ({ referrerAddress, isSubmitting, setIsSubmitting }: any) => {
 
     const [firebaseUser] = useAuthState(auth);
     const { user: web3authUser, address: localAddress } = useWeb3Auth()
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
     const [showPassword, setShowPassword] = useToggle(false);
+
+    const action = (snackbarId: any) => (
+        <>
+            <Button onClick={ () => { closeSnackbar(snackbarId) } } sx={ { color: "black" } }>
+                Dismiss
+            </Button>
+        </>
+    );
 
     // TODO: use-react-form || react-hook-form-mui https://github.com/dohomi/react-hook-form-mui || react-use 's useStateValidator
     const RegisterSchema = Yup.object().shape({
@@ -51,17 +61,33 @@ export const SignUpForm = ({ createUserWithEmailAndPassword, setIsSubmitting }: 
         onSubmit: async (values) => {
             setIsSubmitting(true)
 
-            try {
-                await auth.setPersistence(browserSessionPersistence)
-                await createUserWithEmailAndPassword(values.email, values.password)
-                logEvent(analytics, "sign_up_started", { method: "Email/Password" })
-            } catch (error) {
-                console.error(error)
-                alert("user registration error!")
+            await auth.setPersistence(browserSessionPersistence)
+            // await createUserWithEmailAndPassword(values.email, values.password)
+            createUserWithEmailAndPassword(auth, values.email, values.password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user
 
-            } finally {
-                setIsSubmitting(false)
-            }
+                    if (referrerAddress) {
+                        setDoc(doc(COL_REF_REFERRALS, user.uid), {
+                            referrerAddress: referrerAddress,
+                        })
+                    } else {
+                        console.log("no referrer")
+                    }
+
+                })
+                .catch((error) => {
+                    const ERROR_MSG = 'auth/email-already-in-use'
+                    if (error.code === ERROR_MSG) {
+                        enqueueSnackbar("Email already registered. Sign-in instead.", { variant: 'error', autoHideDuration: 2000, action })
+                    } else {
+                        console.error(error)
+                    }
+                    setIsSubmitting(false)
+                });
+
+            logEvent(analytics, "sign_up_started", { method: "Email/Password" })
         },
     });
 
@@ -89,7 +115,7 @@ export const SignUpForm = ({ createUserWithEmailAndPassword, setIsSubmitting }: 
                                     { ...getFieldProps('email') }
                                     error={ Boolean(touched.email && errors.email) }
                                     helperText={ touched.email && errors.email }
-                                    disabled={ (isFormikSumbitting || !!web3authUser) }
+                                    disabled={ isSubmitting || isFormikSumbitting || !!web3authUser }
                                 />
 
                                 <TextField
@@ -108,7 +134,7 @@ export const SignUpForm = ({ createUserWithEmailAndPassword, setIsSubmitting }: 
                                     } }
                                     error={ Boolean(touched.password && errors.password) }
                                     helperText={ touched.password && errors.password }
-                                    disabled={ (isFormikSumbitting || !!web3authUser) }
+                                    disabled={ isSubmitting || isFormikSumbitting || !!web3authUser }
                                 />
 
                                 <TextField
@@ -127,9 +153,9 @@ export const SignUpForm = ({ createUserWithEmailAndPassword, setIsSubmitting }: 
                                     } }
                                     error={ Boolean(touched.passwordConfirm && errors.passwordConfirm) }
                                     helperText={ touched.passwordConfirm && errors.passwordConfirm }
-                                    disabled={ (isFormikSumbitting || !!web3authUser) }
+                                    disabled={ isSubmitting || isFormikSumbitting || !!web3authUser }
                                 />
-                                <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={ isFormikSumbitting || !!web3authUser }>
+                                <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={ isSubmitting || isFormikSumbitting || !!web3authUser }>
                                     Register
                                 </LoadingButton>
                             </Stack>

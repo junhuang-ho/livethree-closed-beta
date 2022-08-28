@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import { CallProvider } from './contexts/Call';
 import { AuthenticationGuard } from './components/AuthenticationGuard';
+import { ReferralGuard } from './components/ReferralGuard';
 import { MainLayout } from './layouts/MainLayout';
 import { SplashPage } from './pages/utils/SplashPage';
 import { ErrorPage } from './pages/utils/ErrorPage';
@@ -46,6 +47,12 @@ export const App = () => {
             <Route path='/verification-request' element={ <React.Suspense fallback={ <SplashPage /> }><VerifyFirebaseEmailRequest /></React.Suspense> } />
             {/* <Route path='/reset-password' element={ <React.Suspense fallback={ <SplashPage /> }><ResetPasswordPage /></React.Suspense> } /> */ }
             {/* <Route path='/reset-password-request' element={ <React.Suspense fallback={ <SplashPage /> }><ResetPasswordRequestPage /></React.Suspense> } /> */ }
+            <Route path='/r/:address' element={
+                <ReferralGuard>
+                    <SignUpPage />
+                </ReferralGuard>
+            }
+            />
             <Route path='/error' element={ <ErrorPage /> } />
             <Route
                 path="*"

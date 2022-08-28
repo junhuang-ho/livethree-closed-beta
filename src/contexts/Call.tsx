@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { doc, setDoc, getDocs, updateDoc, deleteDoc, serverTimestamp, orderBy, limit, query, where } from "firebase/firestore"
-import { COL_REF_USERS, COL_REF_CALLER_HAS_ROOM, getColRefActive, getColRefHistoryKey, functions, auth, analytics } from '../services/firebase';
+import { increment, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, serverTimestamp, orderBy, limit, query, where } from "firebase/firestore"
+import { COL_REF_PROMO1, COL_REF_REFERRALS, COL_REF_USERS, COL_REF_CALLER_HAS_ROOM, getColRefActive, getColRefHistoryKey, functions, auth, analytics, db } from '../services/firebase';
 import { logEvent } from 'firebase/analytics';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -17,10 +17,10 @@ import useSound from 'use-sound';
 import ringtone from '../assets/ringtone.wav'
 
 import { ROLE_CALLER, ROLE_CALLEE } from '../configs/hms';
-import { CALL_PENDING_EXPIRE_IN_MS, PLACEHOLDER_ADDRESS, END_CALL_BUFFER_SECONDS, CALL_HISTORY_LIMIT } from '../configs/general';
+import { CALL_PENDING_EXPIRE_IN_MS, PLACEHOLDER_ADDRESS, END_CALL_BUFFER_SECONDS, CALL_HISTORY_LIMIT, REFERRAL_MIN_DURATION_S } from '../configs/general';
 import { POLYGON_ADDRESS_USDCx, MUMBAI_ADDRESS_fUSDCx } from '../configs/blockchain/superfluid';
 import { CHAIN_ID_POLYGON, CHAIN_ID_MUMBAI } from '../configs/blockchain/web3auth';
-import { ADMIN_ADDRESS } from '../configs/blockchain/admin';
+import { ADMIN_ADDRESS, PROMO1_COUNT } from '../configs/blockchain/admin';
 
 import {
     useHMSActions,
@@ -59,7 +59,7 @@ export interface ICallContext {
     acceptCall: (callerAddress: any, roomId: any) => Promise<void>;
     cleanUp: (calleeAddress: any, callerAddress: any, active?: boolean, reason?: string, initiateEnd?: boolean) => Promise<void>;
     clearPendingCall: () => void
-    clearActiveCall: () => void
+    clearActiveCallBatch: () => void
     setIsRingtoneEnabled: (value: boolean) => void
 }
 
@@ -78,7 +78,7 @@ export const CallContext = createContext<ICallContext>({
     acceptCall: async (callerAddress: any, roomId: any) => { },
     cleanUp: async (calleeAddress: any, callerAddress: any, active?: boolean, reason?: string, initiateEnd?: boolean) => { },
     clearPendingCall: () => { },
-    clearActiveCall: () => { },
+    clearActiveCallBatch: () => { },
     setIsRingtoneEnabled: (value: boolean) => { },
 })
 
@@ -470,7 +470,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         if (otherAddress !== PLACEHOLDER_ADDRESS && otherAddress !== localAddress) {
             console.log("clear call - ACTIVE - endActiveCallFromCaller")
             await cleanUp(otherAddress, localAddress, true, "out of funds")
-            clearActiveCall()
+            clearActiveCallBatch()
         }
     }
 
@@ -478,16 +478,46 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         if (otherAddress !== PLACEHOLDER_ADDRESS && otherAddress !== localAddress) {
             console.log("clear call - ACTIVE - endActiveCallFromCallee")
             await cleanUp(localAddress, otherAddress, true, "")
-            clearActiveCall()
+            clearActiveCallBatch()
         }
+    }
+
+    const useReferral = async () => { // applies to both caller & callee
+        const docRef = doc(COL_REF_REFERRALS, firebaseUser?.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data()
+            console.warn("REFERRER ADDRESS:", data.referrerAddress)
+            // const batch = writeBatch(db) // firestore rules contradicts
+
+            // batch.set(doc(COL_REF_PROMO1, data.referrerAddress), { count: increment(PROMO1_COUNT) }, { merge: true })
+            // batch.delete(docRef)
+
+            setDoc(doc(COL_REF_PROMO1, data.referrerAddress), { count: increment(PROMO1_COUNT) }, { merge: true })
+            deleteDoc(docRef)
+        } else {
+            console.warn("No referrer to register");
+        }
+
+        // TODO: check if got firestore referral field value, if so, 
+        // 1. DELETE it 
+        // 2. add in firestore, "promo1" collection | promo1 => <referrer's address> => {count: +1}
+    }
+
+    const clearActiveCallBatch = () => {
+        console.warn("LiveThree: batch timers cleared")
+        clearActiveCall()
+        clearReferralCall()
     }
 
     const [isCallPending, clearPendingCall, resetPendingCall] = useTimeoutFn(endPendingCallFromCaller, CALL_PENDING_EXPIRE_IN_MS)
     const [isCallActive, clearActiveCall, resetActiveCall] = useTimeoutFn(endActiveCallFromCaller, Number(activeCallMaxSeconds) * 1000) // TODO: caution for BigNumber | * 1000 to convert to MS
+    const [isReferralCall, clearReferralCall, resetReferralCall] = useTimeoutFn(useReferral, REFERRAL_MIN_DURATION_S * 1000)
 
     useEffectOnce(() => {
         clearPendingCall()
-        clearActiveCall()
+        clearActiveCallBatch()
     })
 
     const clearEventListener = () => {
@@ -673,6 +703,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
             await cleanUp(otherAddress, localAddress, false, "simple clean up", false, true)
         }
         if (hmsNotification?.type === HMSNotificationTypes.ROOM_ENDED) { // other party ends room
+            clearActiveCallBatch()
             setIsEnding(true)
             notifyCallEnded()
             cleanUpOnCallerEndCallProperly()
@@ -734,6 +765,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         if (activeCallMaxSeconds !== "0" && activeRoomData?.caller === localAddress) {
             console.warn("LiveThree: End active call timer begins", activeCallMaxSeconds)
             resetActiveCall()
+            resetReferralCall()
         }
 
         const setMaxSeconds = async () => {
@@ -752,6 +784,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
     useUpdateEffect(() => {
         if (activeRoomData?.maxSeconds && activeRoomData?.callee === localAddress) {
             setActiveCallMaxSeconds(activeRoomData?.maxSeconds) // set for callee
+            resetReferralCall()
         }
     }, [activeRoomData?.maxSeconds])
 
@@ -770,7 +803,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
             navigate(location.state?.from?.pathname || '/', { replace: true })
 
             clearPendingCall()
-            clearActiveCall()
+            clearActiveCallBatch()
 
             setErrorCreatingFlow(null)
             setErrorDeletingFlow(null)
@@ -811,7 +844,7 @@ export const CallProvider = ({ children }: { children: JSX.Element }) => {
         acceptCall,
         cleanUp,
         clearPendingCall,
-        clearActiveCall,
+        clearActiveCallBatch,
         setIsRingtoneEnabled,
     }
     return (

@@ -9,7 +9,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import { useSnackbar } from 'notistack';
 
-export const ButtonCopy = ({ value }: { value: any }) => {
+export const ButtonCopy = ({ value, msg = 'Address' }: { value: any, msg?: string }) => {
     const theme = useTheme()
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -28,7 +28,7 @@ export const ButtonCopy = ({ value }: { value: any }) => {
             <IconButton
                 onClick={ () => {
                     copyToClipboard(value)
-                    enqueueSnackbar("Address copied!", { variant: 'info', autoHideDuration: 2000, action })
+                    enqueueSnackbar(`${ msg } copied!`, { variant: 'info', autoHideDuration: 2000, action })
                 } }
             >
                 <Avatar

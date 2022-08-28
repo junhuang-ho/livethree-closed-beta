@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Navigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
@@ -8,18 +8,14 @@ import Stack from "@mui/material/Stack";
 import Link from "@mui/material/Link";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import { auth } from "../../services/firebase";
 
 import { useResponsive } from '../../hooks/useResponsive';
 
 import { Logo } from '../../components/Logo';
 import { SignUpForm } from '../../components/SignUpForm';
 
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { useWeb3Auth } from "../../contexts/Web3Auth";
 import { useAuthenticationState } from '../../contexts/AuthenticationState';
-import { useSnackbar } from 'notistack';
 // import { DialogTermsOfService } from "../../components/dialogs/DialogTermsOfService";
 
 import { SplashPage } from '../utils/SplashPage';
@@ -57,27 +53,13 @@ const ContentStyle = styled('div')(({ theme }) => ({
 }));
 
 const SignUpPage = () => {
+    const params = useParams()
     const isMobile = useResponsive('down', 'sm');
 
-    const [createUserWithEmailAndPassword, _, __, firebaseUserError] = useCreateUserWithEmailAndPassword(auth);
     const { user: web3authUser } = useWeb3Auth()
     const { firebaseUser } = useAuthenticationState()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-    const action = (snackbarId: any) => (
-        <>
-            <Button onClick={ () => { closeSnackbar(snackbarId) } } sx={ { color: "black" } }>
-                Dismiss
-            </Button>
-        </>
-    );
-    useEffect(() => {
-        if (firebaseUserError && isSubmitting) {
-            enqueueSnackbar("Sign up error, email may have already been registered.", { variant: 'error', autoHideDuration: 2000, action })
-        }
-    }, [firebaseUserError, isSubmitting])
 
     useEffect(() => {
         if (firebaseUser && web3authUser) {
@@ -89,7 +71,7 @@ const SignUpPage = () => {
         return (
             <RootStyle>
                 <HeaderStyle>
-                    { !isMobile && !isSubmitting && (
+                    { !params.address && !isMobile && !isSubmitting && (
                         <Typography variant="body2" sx={ { mt: { md: -2 } } }>
                             Already have an account? { '' }
                             <Link variant="subtitle2" component={ RouterLink } to="/sign-in">
@@ -116,10 +98,11 @@ const SignUpPage = () => {
                                 {/* <AuthSocial /> */ }
 
                                 <SignUpForm
-                                    createUserWithEmailAndPassword={ createUserWithEmailAndPassword }
+                                    referrerAddress={ params.address }
+                                    isSubmitting={ isSubmitting }
                                     setIsSubmitting={ setIsSubmitting }
                                 />
-                                { isMobile && !isSubmitting && (
+                                { !params.address && isMobile && !isSubmitting && (
                                     <Typography variant="body2" sx={ { mt: 3, textAlign: 'center' } }>
                                         Already have an account?{ ' ' }
                                         <Link variant="subtitle2" to="/sign-in" component={ RouterLink }>

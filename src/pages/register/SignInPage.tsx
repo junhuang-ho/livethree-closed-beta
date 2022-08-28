@@ -1,15 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { styled } from '@mui/material/styles';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from "../../services/firebase";
 
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
 
 import { SplashPage } from '../utils/SplashPage';
 
@@ -17,7 +14,6 @@ import { SignInForm } from "../../components/SignInForm";
 import { Logo } from "../../components/Logo";
 
 import { useResponsive } from '../../hooks/useResponsive';
-import { useSnackbar } from 'notistack';
 import { useAuthenticationState } from '../../contexts/AuthenticationState';
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -56,24 +52,8 @@ const SignInPage = () => {
     const isMobile = useResponsive('down', 'sm');
 
     const { firebaseUser } = useAuthenticationState()
-    const [signInWithEmailAndPassword, _, __, firebaseUserError] = useSignInWithEmailAndPassword(auth);
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-    const action = (snackbarId: any) => (
-        <>
-            <Button onClick={ () => { closeSnackbar(snackbarId) } } sx={ { color: "black" } }>
-                Dismiss
-            </Button>
-        </>
-    );
-
-    useEffect(() => {
-        if (firebaseUserError && isSubmitting) {
-            enqueueSnackbar("Invalid email or password!", { variant: 'error', autoHideDuration: 2000, action })
-        }
-    }, [firebaseUserError, isSubmitting])
 
     if (!firebaseUser) {
         return (
@@ -106,7 +86,7 @@ const SignInPage = () => {
                                 {/* <AuthSocial /> */ }
 
                                 <SignInForm
-                                    signInWithEmailAndPassword={ signInWithEmailAndPassword }
+                                    isSubmitting={ isSubmitting }
                                     setIsSubmitting={ setIsSubmitting }
                                 />
                                 <Box sx={ { p: 5 } }></Box>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 
 import { setDoc, doc } from "firebase/firestore"

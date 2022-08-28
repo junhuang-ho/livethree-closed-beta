@@ -14,13 +14,22 @@ import { LoadingButton } from '@mui/lab';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useToggle } from 'react-use';
-
+import { useSnackbar } from 'notistack';
 import { auth, analytics } from '../services/firebase';
 import { logEvent } from 'firebase/analytics';
-import { browserSessionPersistence } from 'firebase/auth';
+import { signInWithEmailAndPassword, browserSessionPersistence } from 'firebase/auth';
 
-export const SignInForm = ({ signInWithEmailAndPassword, setIsSubmitting }: any) => {
+export const SignInForm = ({ isSubmitting, setIsSubmitting }: any) => {
     const [showPassword, setShowPassword] = useToggle(false);
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+    const action = (snackbarId: any) => (
+        <>
+            <Button onClick={ () => { closeSnackbar(snackbarId) } } sx={ { color: "black" } }>
+                Dismiss
+            </Button>
+        </>
+    );
 
     // TODO: use-react-form || react-use 's useStateValidator
     const LoginSchema = Yup.object().shape({
@@ -38,24 +47,31 @@ export const SignInForm = ({ signInWithEmailAndPassword, setIsSubmitting }: any)
         onSubmit: async (values) => {
             setIsSubmitting(true)
 
-            try {
-                await auth.setPersistence(browserSessionPersistence)
-                await signInWithEmailAndPassword(values.email, values.password)
-                logEvent(analytics, "sign_in")
-            } catch (error: any) {
-                if (error.code === "auth/user-not-found") {
-                    alert("Account Not Registered!")
-                } else {
-                    console.log(error)
-                    alert("sign in error!")
-                }
-            }
+            await auth.setPersistence(browserSessionPersistence)
+            // await signInWithEmailAndPassword(values.email, values.password)
+            signInWithEmailAndPassword(auth, values.email, values.password)
+                .then((userCredential) => {
+                    // Signed in 
+                    // const user = userCredential.user;
+                })
+                .catch((error) => {
+                    const ERROR_MSG_1 = 'auth/user-not-found'
+                    const ERROR_MSG_2 = 'auth/wrong-password'
+                    if (error.code === ERROR_MSG_1 || error.code === ERROR_MSG_2) {
+                        enqueueSnackbar("Invalid email or password!", { variant: 'error', autoHideDuration: 2000, action })
+                    } else {
+                        console.error(error)
+                    }
+                    setIsSubmitting(false)
+                });
 
-            setIsSubmitting(false)
+            logEvent(analytics, "sign_in")
+
+            // setIsSubmitting(false)
         },
     });
 
-    const { errors, touched, values, isSubmitting, handleSubmit, getFieldProps } = formik;
+    const { errors, touched, values, isSubmitting: isFormikSumbitting, handleSubmit, getFieldProps } = formik;
 
     return (
         <FormikProvider value={ formik }>
@@ -69,7 +85,7 @@ export const SignInForm = ({ signInWithEmailAndPassword, setIsSubmitting }: any)
                         { ...getFieldProps('email') }
                         error={ Boolean(touched.email && errors.email) }
                         helperText={ touched.email && errors.email }
-                        disabled={ (isSubmitting) }
+                        disabled={ isSubmitting || isFormikSumbitting }
                     />
 
                     <TextField
@@ -88,27 +104,14 @@ export const SignInForm = ({ signInWithEmailAndPassword, setIsSubmitting }: any)
                         } }
                         error={ Boolean(touched.password && errors.password) }
                         helperText={ touched.password && errors.password }
-                        disabled={ (isSubmitting) }
+                        disabled={ isSubmitting || isFormikSumbitting }
                     />
                 </Stack>
 
                 <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={ { my: 2 } }>
                     <Box sx={ { p: 1 } }></Box>
-                    {/* <FormControlLabel
-                        control={ <Checkbox disabled={ isSubmitting } { ...getFieldProps('remember') } checked={ values.remember } /> }
-                        label="Remember me"
-                    />
-                    { isSubmitting ? (
-                        <Link component={ Button } variant="subtitle2" underline="hover" disabled>
-                            Forgot password?
-                        </Link>
-                    ) : (
-                        <Link component={ RouterLink } variant="subtitle2" to="/reset-password" underline="hover">
-                            Forgot password?
-                        </Link>
-                    ) } */}
                 </Stack>
-                <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={ isSubmitting }>
+                <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={ isSubmitting || isFormikSumbitting }>
                     Login
                 </LoadingButton>
             </Form>
