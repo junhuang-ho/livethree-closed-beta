@@ -69,13 +69,6 @@ export const BuyToken = () => {
                     >
                         <Button
                             onClick={ () => {
-                                window.open("https://ramp.network/buy/", '_blank', 'noopener');
-                            } }
-                        >
-                            <img src={ rampIcon } />
-                        </Button>
-                        <Button
-                            onClick={ () => {
                                 window.open("https://www.moonpay.com/buy", '_blank', 'noopener')
                             } }
                         >
@@ -94,6 +87,13 @@ export const BuyToken = () => {
                             } }
                         >
                             <img src={ simplexIcon } style={ { width: '150px' } } />
+                        </Button>
+                        <Button
+                            onClick={ () => {
+                                window.open("https://ramp.network/buy/", '_blank', 'noopener');
+                            } }
+                        >
+                            <img src={ rampIcon } />
                         </Button>
                     </Stack>
                 </Stack>
