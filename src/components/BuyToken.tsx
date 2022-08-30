@@ -39,63 +39,90 @@ export const BuyToken = () => {
             <CardContent>
                 <Stack spacing={ 1 }>
                     <Typography align="justify">
-                        Select from a range of third party providers to buy MATIC or USDC in
-                        order to top-up your LiveThree account. Please select the MATIC and USDC
-                        tokens that are on the <Box component="span" fontWeight='fontWeightMedium' display='inline'>Polygon network </Box>
-                        only.
+                        Please follow the instructions below to ensure you top-up your LiveThree account
+                        with MATIC or USDC correctly.
                     </Typography>
-                    <Typography align="justify">
-                        Remember to send your funds to use your LiveThree account address:
-                    </Typography>
-                    <Stack
-                        direction="row"
-                        justifyContent="center"
-                        alignItems="center"
-                    >
-                        <Typography align="justify">
-                            { isMobile ? shortenAddress(localAddress) : localAddress }
+                    <Box sx={ { pl: 2, py: 2 } }>
+                        <ol>
+                            <li>
+                                Select from a range of third party providers to buy MATIC or USDC.
+                                KYC verification is required. Please select the MATIC or USDC
+                                tokens that are on the <Box component="span" fontWeight='fontWeightMedium' display='inline'>Polygon network </Box>
+                                only.
+                            </li>
+                            <Typography align="justify" sx={ { pt: 2 } }>
+                                Third party providers:
+                            </Typography>
+                            <Stack
+                                direction={ isMobile ? "column" : "row" }
+                                justifyContent="center"
+                                alignItems="center"
+                                spacing={ 2 }
+                                sx={ { py: 2 } }
+                            >
+                                <Button
+                                    onClick={ () => {
+                                        window.open("https://www.moonpay.com/buy", '_blank', 'noopener')
+                                    } }
+                                >
+                                    <img src={ moonpayIcon } style={ { width: '155px' } } />
+                                </Button>
+                                <Button
+                                    onClick={ () => {
+                                        window.open("https://global.transak.com/?utm_campaign=Website%20Conversions&utm_source=homePage&utm_medium=menu&utm_term=buy-crypto", '_blank', 'noopener')
+                                    } }
+                                >
+                                    <img src={ transakIcon } style={ { width: '150px' } } />
+                                </Button>
+                                <Button
+                                    onClick={ () => {
+                                        window.open("https://buy-crypto.chainbits.com/", '_blank', 'noopener')
+                                    } }
+                                >
+                                    <img src={ simplexIcon } style={ { width: '150px' } } />
+                                </Button>
+                                <Button
+                                    onClick={ () => {
+                                        window.open("https://ramp.network/buy/", '_blank', 'noopener');
+                                    } }
+                                >
+                                    <img src={ rampIcon } />
+                                </Button>
+                            </Stack>
+                            <li>
+                                When prompt to input your address, please input the address of your
+                                existing MetaMask wallet (or equivalent external wallet that you trust).
+                                <Box component="span" fontWeight='fontWeightMedium' display='inline'> Do not </Box>
+                                input your LiveThree address here.
+                            </li>
+                            <li>
+                                Once you have received your MATIC or USDC in your external wallet, you can now send them
+                                to your LiveThree address.
+                            </li>
+                            <Typography align="justify" sx={ { pt: 2 } }>
+                                Your LiveThree account address:
+                            </Typography>
+                            <Stack
+                                direction="row"
+                                justifyContent="center"
+                                alignItems="center"
+                            >
+                                <Typography align="justify">
+                                    { isMobile ? shortenAddress(localAddress) : localAddress }
+                                </Typography>
+                                <ButtonCopy value={ localAddress } />
+                            </Stack>
+                            <Box sx={ { p: 1 } }></Box>
+                            <li>
+                                That's it! If you send over some USDC, you can now wrap it to USDCx to start using it
+                                in money streaming video calls.
+                            </li>
+                        </ol>
+                        <Typography align="justify" variant="body2" sx={ { pt: 2 } }>
+                            *We are working hard to allow you to buy directly into your LiveThree address. In the meantime,
+                            please follow the instructions above.
                         </Typography>
-                        <ButtonCopy value={ localAddress } />
-                    </Stack>
-                    <Box sx={ { p: 1 } }></Box>
-                    <Typography align="justify">
-                        Third party providers:
-                    </Typography>
-                    <Stack
-                        direction={ isMobile ? "column" : "row" }
-                        justifyContent="center"
-                        alignItems="center"
-                        spacing={ 2 }
-                    >
-                        <Button
-                            onClick={ () => {
-                                window.open("https://www.moonpay.com/buy", '_blank', 'noopener')
-                            } }
-                        >
-                            <img src={ moonpayIcon } style={ { width: '155px' } } />
-                        </Button>
-                        <Button
-                            onClick={ () => {
-                                window.open("https://global.transak.com/?utm_campaign=Website%20Conversions&utm_source=homePage&utm_medium=menu&utm_term=buy-crypto", '_blank', 'noopener')
-                            } }
-                        >
-                            <img src={ transakIcon } style={ { width: '150px' } } />
-                        </Button>
-                        <Button
-                            onClick={ () => {
-                                window.open("https://buy-crypto.chainbits.com/", '_blank', 'noopener')
-                            } }
-                        >
-                            <img src={ simplexIcon } style={ { width: '150px' } } />
-                        </Button>
-                        <Button
-                            onClick={ () => {
-                                window.open("https://ramp.network/buy/", '_blank', 'noopener');
-                            } }
-                        >
-                            <img src={ rampIcon } />
-                        </Button>
-                    </Stack>
+                    </Box>
                 </Stack>
             </CardContent>
         </Card >
