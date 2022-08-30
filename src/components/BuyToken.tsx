@@ -69,7 +69,7 @@ export const BuyToken = () => {
                     >
                         <Button
                             onClick={ () => {
-                                window.open("https://buy.ramp.network/", '_blank', 'noopener');
+                                window.open("https://ramp.network/buy/", '_blank', 'noopener');
                             } }
                         >
                             <img src={ rampIcon } />

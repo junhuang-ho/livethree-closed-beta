@@ -49,24 +49,15 @@ ref: https://stackoverflow.com/questions/42458434/how-to-set-build-env-variables
 
 - connect wallet
 
-
-
- ---- BUGGY ----
-- sometimes just failed to load:
-GET https://broadcast-server.tor.us/store/get?key=04d34af91b22f5e49a5ecf308da2df80d4b85a209e54622d25f77d061bad174ffa0dd4de3d004a8cb134da87458c03d95be32f3fe56fc76e035e6250cf8b522b10 404
-
-
 test
 ### during closed beta
-- upgrade Alchemy so dont hit limit
-- upgrade 100ms so dont hit limit
-- upgrade Web3Auth so dont hit limit
+- upgrade Alchemy so dont hit limit (have buffer - check daily!!)
+- upgrade 100ms so dont hit limit (wait meeting tonight)
+- upgrade Web3Auth so dont hit limit (pay by invoice)
 
 - apply SF grant (in progress Reactor or WavePool)
 - apply polygon grant (meh, need 500 twitter follower)
 - apply 100ms grant? (startup got special starting rates)
-
-- change { isDebugger && <Debugger /> } into  <Debugger2 />
 
 ### Enhancements - must haves
 - do testing driven development when rework the livethree app | https://www.youtube.com/watch?v=04BBgg8zgWo&ab_channel=LaithAcademy | https://www.youtube.com/results?search_query=react+testing
